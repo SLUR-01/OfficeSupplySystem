@@ -1,0 +1,174 @@
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    
+     
+        const radioButtons = document.querySelectorAll('input[name="selectedRequest"]');
+        const processReturnBtn = document.getElementById('processReturnBtn');
+    
+        const now = new Date();
+        document.getElementById('return_date').value = now.toISOString().slice(0, 16);
+    
+        document.getElementById('returnForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+     // Get the file input element
+    // Get the file input element
+    const proofImageInput = document.getElementById('proof_image');
+    
+    // Check if a file is selected
+    if (!proofImageInput.files || proofImageInput.files.length === 0) {
+        // Show SweetAlert message
+        Swal.fire({
+            title: 'Proof Required',
+            text: 'Please attach an image proof of the item condition before submitting.',
+            icon: 'warning',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3085d6',
+        });
+        return; // Exit the function and prevent form submission
+    }
+            const returnQuantity = parseInt(document.getElementById('quantity').value);
+            const maxQuantity = parseInt(document.getElementById('quantity').max);
+    
+            if (isNaN(returnQuantity) || returnQuantity < 1 || returnQuantity > maxQuantity) {
+                Swal.fire({ icon: 'error', title: 'Invalid Quantity', text: `Please enter a valid quantity between 1 and ${maxQuantity}` });
+                return;
+            }
+    
+            const returnDate = new Date(document.getElementById('return_date').value);
+            const currentDate = new Date();
+            const hoursLate = (currentDate - returnDate) / (1000 * 60 * 60);
+    
+            if (hoursLate > 24) {
+                Swal.fire({ icon: 'error', title: 'Late Return', text: 'Cannot submit return because it is more than 24 hours late' });
+                return;
+            }
+    
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="flex items-center justify-center"><svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Processing...</span>`;
+    
+            const formData = new FormData(this);
+    
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            })
+            .then(async response => {
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) return response.json();
+                const text = await response.text();
+                if (response.ok) return { success: true, message: 'Return submitted successfully!' };
+                const doc = new DOMParser().parseFromString(text, 'text/html');
+                const errorMsg = doc.querySelector('.alert-danger, .error, [role="alert"]')?.textContent.trim() || 'An error occurred while processing your request';
+                throw new Error(errorMsg);
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({ icon: 'success', title: 'Success!', text: data.message }).then(() => {
+                        this.reset();
+                        document.getElementById('returnModal').classList.add('hidden');
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(data.message || 'Error submitting return');
+                }
+            })
+            .catch(error => {
+                Swal.fire({ icon: 'error', title: 'Error', text: error.message || 'An error occurred while submitting the return' });
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit Return';
+            });
+        });
+    
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', function () {
+                processReturnBtn.disabled = !this.checked;
+            });
+        });
+    
+        const modal = document.getElementById('returnModal');
+        const cancelReturnBtn = document.getElementById('cancelReturnBtn');
+
+processReturnBtn.addEventListener('click', function () {
+    const selectedRadio = document.querySelector('input[name="selectedRequest"]:checked');
+    if (selectedRadio) {
+        document.getElementById('modalItemName').textContent = selectedRadio.dataset.itemName;
+        document.getElementById('modalQuantity').textContent = selectedRadio.dataset.quantity;
+
+        document.getElementById('requestIdInput').value = selectedRadio.value;
+        document.getElementById('userId').value = selectedRadio.dataset.userId;
+        document.getElementById('requesterName').value = selectedRadio.dataset.requesterName;
+        document.getElementById('department').value = selectedRadio.dataset.department;
+        document.getElementById('itemName').value = selectedRadio.dataset.itemName;
+
+        const quantityInput = document.getElementById('quantity');
+        quantityInput.value = selectedRadio.dataset.quantity;
+        quantityInput.max = selectedRadio.dataset.quantity;
+
+        modal.classList.remove('hidden');
+    }
+});
+    
+        cancelReturnBtn.addEventListener('click', () => modal.classList.add('hidden'));
+        modal.addEventListener('click', e => { if (e.target === modal) modal.classList.add('hidden'); });
+    
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+    
+        function switchTab(tabName) {
+            tabContents.forEach(content => content.classList.add('hidden'));
+            document.getElementById(`${tabName}-content`)?.classList.remove('hidden');
+            tabButtons.forEach(btn => btn.classList.remove('text-blue-700', 'border-b-2', 'border-blue-500', 'active-tab', 'text-gray-600'));
+            document.querySelector(`[data-tab="${tabName}"]`)?.classList.add('text-blue-700', 'border-b-2', 'border-blue-500', 'active-tab');
+            window.history.pushState({ tab: tabName }, '', window.location.pathname + '?tab=' + tabName);
+        }
+    
+        tabButtons.forEach(button => button.addEventListener('click', function () {
+            switchTab(this.getAttribute('data-tab'));
+        }));
+    
+        const tabParam = new URLSearchParams(window.location.search).get('tab');
+        switchTab(['requests', 'withdrawals', 'returns'].includes(tabParam) ? tabParam : 'requests');
+    
+        window.addEventListener('popstate', function (event) {
+            if (event.state?.tab) switchTab(event.state.tab);
+        });
+    
+        window.verifyReturn = function (returnId) {
+            if (confirm('Are you sure you want to verify this return?')) {
+                fetch(`/admin/returns/${returnId}/verify`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => data.success ? location.reload() : alert('Error verifying return'))
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error verifying return');
+                });
+            }
+        };
+    
+        window.copyRequestId = function (requestId) {
+            navigator.clipboard.writeText(requestId)
+                .then(() => alert('Request ID copied to clipboard: ' + requestId))
+                .catch(err => console.error('Failed to copy: ', err));
+        };
+    
+        window.showPrintModal = showPrintModal;
+        window.closePrintModal = closePrintModal;
+        window.printRequest = printRequest;
+    
+    });
+    </script>
+    
