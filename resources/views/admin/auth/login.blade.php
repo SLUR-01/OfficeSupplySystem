@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-split-layout>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
    <h3 class="text-center mb-3">Admin Login Page</h3>
@@ -44,4 +44,4 @@
             </x-primary-button>
         </div>
     </form>
-</x-guest-layout>
+</x-split-layout>

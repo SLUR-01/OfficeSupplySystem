@@ -139,6 +139,18 @@ public function withdrawStock(Request $request)
     }
 }
 
+
+public function destroyItem($id)
+{
+    $item = Stock::findOrFail($id);
+    $item->delete();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Item deleted successfully.'
+    ]);
+}
+
         
 
         

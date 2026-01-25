@@ -93,7 +93,17 @@
                        <td class="px-3 py-3 text-left text-gray-500 text-sm">
                             {{ $stock->updated_at ? \Carbon\Carbon::parse($stock->updated_at)->format('M d, Y h:i A') : 'N/A' }}
                         </td>
-                        
+                        <td class="px-3 py-3 text-gray-800 font-medium">{{ $stock->damaged_count }}</td>
+                        <td class="px-3 py-3 text-gray-800 font-medium">
+                            <div class="flex justify-center space-x-2">
+                               <button type="button"
+                                        class="px-3 py-2 rounded-md text-white bg-red-600 hover:bg-red-700 transition shadow-sm delete-btn"
+                                        data-id="{{ $stock->id }}">
+                                    Delete
+                                </button>
+
+                            </div>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -104,7 +114,33 @@
                 </tr>
             </table>
         </div>
-                    
+                    <!-- Delete Confirmation Modal -->
+<div id="deleteModal"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+            Confirm Deletion
+        </h2>
+
+        <p class="text-gray-600 mb-6">
+            Are you sure you want to delete this item? This action cannot be undone.
+        </p>
+
+        <div class="flex justify-end space-x-3">
+            <button id="cancelDelete"
+                    class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                Cancel
+            </button>
+
+            <button id="confirmDelete"
+                    class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+
     <div id="add-stock-modal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden z-50">
     
         <div class="bg-white p-6 rounded-lg shadow-lg w-96 transform transition-all duration-300 scale-95">
@@ -269,6 +305,36 @@
 
 
    <script>
+
+    let deleteItemId = null;
+
+document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        deleteItemId = button.dataset.id;
+        document.getElementById('deleteModal').classList.remove('hidden');
+        document.getElementById('deleteModal').classList.add('flex');
+    });
+});
+
+document.getElementById('cancelDelete').addEventListener('click', () => {
+    document.getElementById('deleteModal').classList.add('hidden');
+});
+
+document.getElementById('confirmDelete').addEventListener('click', () => {
+    fetch(`/admin/stock/${deleteItemId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json',
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // or remove row dynamically
+        }
+    });
+});
 
 function openAddNewItemModal() {
     const modal = document.getElementById('add-new-item-modal');

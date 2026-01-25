@@ -40,6 +40,7 @@ Route::middleware(['auth', 'is_admin:admin'])->group(function ()
     Route::post('/admin/update-stock', [StockController::class, 'updateStock'])->name('admin.update.stock');
     Route::post('/admin/add-new-item', [StockController::class, 'addNewItem'])->name('admin.add.newItem');  
       // Reports
+    Route::delete('/admin/stock/{id}', [StockController::class, 'destroyItem'])->name('admin.stock.destroy');
     Route::get('admin/monthly-reports', [MonthlyReportController::class, 'monthlyReports'])->name('admin.monthly-reports');
     Route::get('admin/withdrawal', [TransactionController::class, 'withdrawal'])->name('admin.withdrawal');
     Route::post('/admin/requests/{id}/update-withdrawal', [TransactionController::class, 'updateWithdrawal'])->name('admin.requests.update-withdrawal');
