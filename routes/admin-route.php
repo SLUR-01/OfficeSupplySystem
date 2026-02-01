@@ -17,18 +17,45 @@ use App\Http\Controllers\Admin\Auth\RegisteredUserController;
 Route::middleware(['auth', 'is_admin:admin'])->group(function () 
 {
 
-    Route::get('/admin/profile/edit', [ProfileController::class, 'editProfile'])->name('admin.profile.edit');
-    Route::patch('/admin/profile/update', [ProfileController::class, 'updateProfile'])->name('admin.profile.update');
-    Route::delete('/admin/profile/destroy', [ProfileController::class, 'destroyProfile'])->name('admin.profile.destroy');
+    Route::get('/admin/profile/edit', 
+              [ProfileController::class, 'editProfile'])
+              ->name('admin.profile.edit');
 
-    // Admin CRUD
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard'); // Display all requests
-    Route::get('/admin/requests', [AdminController::class, 'requests'])->name('admin.requests'); // Display all requests
-    Route::get('/admin/requests/create', [AdminController::class, 'create'])->name('admin.requests.create'); // Show create form
-    Route::post('/admin/requests', [AdminController::class, 'store'])->name('admin.requests.store'); // Store a request
-    Route::get('/admin/requests/{id}/edit', [AdminController::class, 'edit'])->name('admin.requests.edit'); // Show edit form
-    Route::put('/admin/requests/{id}', [AdminController::class, 'update'])->name('admin.requests.update'); // Update a request
-    Route::delete('/admin/requests/{id}', [AdminController::class, 'destroy'])->name('admin.requests.destroy'); // Delete a request
+    Route::patch('/admin/profile/update',
+                [ProfileController::class, 'updateProfile'])
+                ->name('admin.profile.update');
+
+    Route::delete('/admin/profile/destroy',
+                 [ProfileController::class, 'destroyProfile'])
+                 ->name('admin.profile.destroy');
+                 
+    Route::get('/admin/dashboard',
+              [AdminController::class, 'dashboard'])
+              ->name('admin.dashboard'); 
+
+    Route::get('/admin/requests',
+              [AdminController::class, 'requests'])
+              ->name('admin.requests');
+              
+    Route::get('/admin/requests/create',
+              [AdminController::class, 'create'])
+              ->name('admin.requests.create'); // Show create form
+
+    Route::post('/admin/requests',
+              [AdminController::class, 'store'])
+              ->name('admin.requests.store'); // Store a request
+
+    Route::get('/admin/requests/{id}/edit',
+              [AdminController::class, 'edit'])
+              ->name('admin.requests.edit'); // Show edit form
+
+    Route::put('/admin/requests/{id}',
+              [AdminController::class, 'update'])
+              ->name('admin.requests.update'); // Update a request
+
+    Route::delete('/admin/requests/{id}', 
+              [AdminController::class, 'destroy'])
+              ->name('admin.requests.destroy'); // Delete a request
 
 
     // Update Request
