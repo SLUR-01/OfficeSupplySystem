@@ -32,7 +32,7 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:user,chairman,dean,admin'],
+            'role' => ['required', 'string', 'in:user,admin'],
             'department' => [
                 'nullable',
                 function ($attribute, $value, $fail) use ($request) {
@@ -62,8 +62,6 @@ class RegisteredUserController extends Controller
         // Redirect based on user role
         return match ($user->role) {
             'admin' => redirect()->route('admin.dashboard'),
-            'chairman' => redirect()->route('chairman.dashboard'),
-            'dean' => redirect()->route('dean.dashboard'),
             'user' => redirect()->route('user.dashboard'),
             default => redirect()->route('user.dashboard'), // fallback
         };

@@ -23,59 +23,31 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-public function store(LoginRequest $request): RedirectResponse
-{
-    // Explicitly log out and invalidate session BEFORE doing anything
-    if (Auth::check()) {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+    public function store(LoginRequest $request): RedirectResponse
+    {
+        // Explicitly log out and invalidate session BEFORE doing anything
+        if (Auth::check()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+
+        // Perform the login
+        $request->authenticate();
+
+        // Regenerate session ID to avoid session fixation
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+
+
+        // Redirect based on role
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role === 'user') {
+            return redirect()->route('user.dashboard');
+        }
     }
-
-    // Perform the login
-    $request->authenticate();
-
-    // Regenerate session ID to avoid session fixation
-    $request->session()->regenerate();
-
-    $user = Auth::user();
-
-
-    // Redirect based on role
-    if ($user->role === 'admin') {
-        return redirect()->route('admin.dashboard');
-    } elseif ($user->role === 'chairman') {
-        return redirect()->route('chairman.dashboard');
-    } elseif ($user->role === 'dean') {
-        return redirect()->route('dean.dashboard');
-    } elseif ($user->role === 'user') {
-        return redirect()->route('user.dashboard');
-    }
-
-   
-}
-
-
-    // public function store(LoginRequest $request): RedirectResponse
-    // {
-    //     $request->authenticate();
-
-    //     $request->session()->regenerate();
-
-    //     $user = Auth::user();
-
-    // if ($user->role === 'admin') {
-    //     return redirect()->route('admin.dashboard');
-    // } elseif ($user->role === 'chairman') {
-    //     return redirect()->route('chairman.dashboard');
-    // } elseif ($user->role === 'dean') {
-    //     return redirect()->route('dean.dashboard');
-    // } elseif ($user->role === 'user') {
-    //     return redirect()->route('user.dashboard');
-    // }
-    //     // return redirect('dashboard');
-        
-    // }
 
 
     /**
@@ -91,5 +63,4 @@ public function store(LoginRequest $request): RedirectResponse
 
         return redirect('/');
     }
-    
 }

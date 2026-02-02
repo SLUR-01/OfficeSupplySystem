@@ -12,7 +12,7 @@ use App\Http\Controllers\User\RequestSupplyController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 Route::middleware('guest')->group(function () {
-   
+
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
@@ -32,9 +32,7 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-  
-require __DIR__.'/auth.php';
-require __DIR__.'/admin-route.php';
-require __DIR__.'/chairman-route.php';
-require __DIR__.'/dean-route.php';
-require __DIR__.'/user-route.php';
+
+require __DIR__ . '/auth.php';
+require __DIR__ . '/admin-route.php';
+require __DIR__ . '/user-route.php';

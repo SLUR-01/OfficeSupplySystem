@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\User;
+
 use App\Models\Stock;
 use Illuminate\Http\Request;
 use App\Models\RequestSupply;
@@ -10,22 +11,17 @@ use App\Mail\NewRequestNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Carbon;
+
 class RequestSupplyController extends Controller
-{   
-   
+{
+
     public function request()
     {
-            
         $requests = RequestSupply::where('user_id')
-            ->orderBy('datetime','asc')
-            
+            ->orderBy('datetime', 'asc')
             ->get();
-
-        $stocks = Stock::all(); 
-
+        $stocks = Stock::all();
         return view('user.request', compact('requests', 'stocks'));
-
-
     }
 
     public function storeRequest(Request $request)
@@ -44,24 +40,23 @@ class RequestSupplyController extends Controller
                 'date_needed' => 'required|date|after_or_equal:today',
                 'signature' => 'required|string',
             ]);
-    
-              // Store the request in the database
-        $newRequest = RequestSupply::create($validated);
 
-        // Send email notification
-       $recipientEmail = [
-            'pagulakert@gmail.com',
-            // 'kertjohnpagula9@gmail.com',
-            // 'pagula.kertjohn@llcc.edu.ph'
-        ];
+            // Store the request in the database
+            $newRequest = RequestSupply::create($validated);
 
-        // Or you could get it from the user: $request->user()->email;
-        
-        // Mail::to($recipientEmail)
-        //     ->send(new NewRequestNotification($newRequest));
-    
+            // Send email notification
+            $recipientEmail = [
+                'pagulakert@gmail.com',
+                // 'kertjohnpagula9@gmail.com',
+                // 'pagula.kertjohn@llcc.edu.ph'
+            ];
+
+            // Or you could get it from the user: $request->user()->email;
+
+            // Mail::to($recipientEmail)
+            //     ->send(new NewRequestNotification($newRequest));
+
             return redirect()->route('user.request')->with('success', 'Request submitted successfully!');
-    
         } catch (\Illuminate\Validation\ValidationException $e) {
             return redirect()->back()
                 ->withErrors($e->validator)
@@ -74,60 +69,60 @@ class RequestSupplyController extends Controller
         }
     }
 
-    public function history(Request $request) 
-{
-    $user_id = Auth::id();
-    $sortDirection = $request->get('sort_direction', 'desc');
-    $monthFilter = $request->get('month'); // e.g., '2025-05'
+    public function history(Request $request)
+    {
+        $user_id = Auth::id();
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $monthFilter = $request->get('month'); // e.g., '2025-05'
 
-    // Default to current month if no filter provided
-    $startOfMonth = $monthFilter ? Carbon::parse($monthFilter)->startOfMonth() : Carbon::now()->startOfMonth();
-    $endOfMonth = $monthFilter ? Carbon::parse($monthFilter)->endOfMonth() : Carbon::now()->endOfMonth();
+        // Default to current month if no filter provided
+        $startOfMonth = $monthFilter ? Carbon::parse($monthFilter)->startOfMonth() : Carbon::now()->startOfMonth();
+        $endOfMonth = $monthFilter ? Carbon::parse($monthFilter)->endOfMonth() : Carbon::now()->endOfMonth();
 
-    $requests = RequestSupply::where('user_id', $user_id)
-    ->where('withdrawal_status', 'Completed')
-    ->whereBetween('completed_at', [$startOfMonth, $endOfMonth])
-    ->with(['returns' => function ($query) {
-        $query->where('return_status', 'approved');
-    }])
-    ->orderBy('completed_at', $sortDirection)
-    ->get()
-    ->filter(function ($request) {
-        $totalReturned = $request->returns->sum('quantity');
-        return ($request->quantity - $totalReturned) > 0;
-    })
-    ->map(function ($request) {
-        $request->net_quantity = $request->quantity - $request->returns->sum('quantity');
-        return $request;
-    });
+        $requests = RequestSupply::where('user_id', $user_id)
+            ->where('withdrawal_status', 'Completed')
+            ->whereBetween('completed_at', [$startOfMonth, $endOfMonth])
+            ->with(['returns' => function ($query) {
+                $query->where('return_status', 'approved');
+            }])
+            ->orderBy('completed_at', $sortDirection)
+            ->get()
+            ->filter(function ($request) {
+                $totalReturned = $request->returns->sum('quantity');
+                return ($request->quantity - $totalReturned) > 0;
+            })
+            ->map(function ($request) {
+                $request->net_quantity = $request->quantity - $request->returns->sum('quantity');
+                return $request;
+            });
 
-    $returns = ReturnRequest::where('user_id', $user_id)
-        ->whereIn('return_status', ['approved', 'rejected'])
-        ->get();
-     
+        $returns = ReturnRequest::where('user_id', $user_id)
+            ->whereIn('return_status', ['approved', 'rejected'])
+            ->get();
 
 
-    return view('user.history.history', compact('requests', 'returns', 'monthFilter'));
-}
+
+        return view('user.history.history', compact('requests', 'returns', 'monthFilter'));
+    }
 
 
     public function status()
     {
         $user_id = Auth::id();
-        
+
         // Requests data (first tab)
         $requests = RequestSupply::where('user_id', $user_id)
-        
-    
+
+
             ->get();
-            $returns = ReturnRequest::where('user_id', $user_id)
+        $returns = ReturnRequest::where('user_id', $user_id)
             ->get();
 
 
-            return view('user.status.status', [
-                'requests' => $requests,
-                'returns' => $returns
-            ]);
+        return view('user.status.status', [
+            'requests' => $requests,
+            'returns' => $returns
+        ]);
     }
 
 
@@ -140,28 +135,28 @@ class RequestSupplyController extends Controller
             'item_name'  => $request->item_name,
             'quantity'   => $request->quantity,
             'datetime'   => $request->datetime,
-            'description'=> $request->description,
+            'description' => $request->description,
         ]);
     }
 
-public function checkReturnStatus($requestId)
+    public function checkReturnStatus($requestId)
     {
         $returnExists = ReturnRequest::where('request_id', $requestId)->exists();
-        
-        
+
+
         return response()->json([
             'already_returned' => $returnExists
         ]);
     }
 
-public function store(Request $request)
+    public function store(Request $request)
     {
         try {
             // Add logging to see what's coming in
             \Log::info('Incoming request data:', $request->all());
-            
+
             $validated = $request->validate([
-                'request_id' => 'required|exists:request_supplies,id',
+                // 'request_id' => 'required|exists:request_supplies,id',
                 'condition' => 'required|in:defective,damaged,wrong_item',
                 'quantity' => 'required|integer|min:1',
                 'description' => 'required|string|max:500',
@@ -174,7 +169,7 @@ public function store(Request $request)
 
 
             $originalRequest = RequestSupply::findOrFail($validated['request_id']);
-            
+
             // Create the return record with explicit variant_value handling
             $returnData = [
                 'request_id' => $validated['request_id'],
@@ -190,33 +185,32 @@ public function store(Request $request)
                 'return_status' => 'pending',
             ];
 
-            
+
             // Handle image upload
             if ($request->hasFile('proof_image')) {
-            $file = $request->file('proof_image');
-            $destinationPath = public_path('storage/returns/proof_images'); // Full path to public/storage/returns/proof_images
-            
-            // Make sure the directory exists
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-            }
-            
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move($destinationPath, $filename);
-            
-            $returnData['proof_image'] = 'storage/returns/proof_images/' . $filename; // relative path to use in views
-    }
+                $file = $request->file('proof_image');
+                $destinationPath = public_path('storage/returns/proof_images'); // Full path to public/storage/returns/proof_images
 
- 
-            
+                // Make sure the directory exists
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
+                }
+
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move($destinationPath, $filename);
+
+                $returnData['proof_image'] = 'storage/returns/proof_images/' . $filename; // relative path to use in views
+            }
+
+
+
             $return = ReturnRequest::create($returnData);
             $originalRequest->update(['status' => 'returned']);
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Return submitted successfully!'
             ]);
-    
         } catch (\Exception $e) {
             \Log::error('Return submission error:', ['error' => $e->getMessage()]);
             return response()->json([
@@ -251,8 +245,6 @@ public function store(Request $request)
 
         return redirect()->back()->with('success', 'Return request updated successfully.');
     }
-
-
 }
 
 

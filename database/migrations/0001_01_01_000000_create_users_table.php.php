@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -17,7 +18,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('signature')->nullable();
             $table->string('role')->nullable();
-            $table->string('department')->nullable();; // Remove the column
+            $table->string('department')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

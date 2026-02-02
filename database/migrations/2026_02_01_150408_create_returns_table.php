@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -13,28 +14,30 @@ return new class extends Migration
     {
         Schema::create('returns', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('request_id');
-            $table->unsignedBigInteger('user_id');
-     
+            $table->foreignId('request_id')
+                ->constrained('request_supplies')
+                ->cascadeOnDelete();
             $table->string('requester_name');
-            $table->string('item_name');
-            $table->string('variant_value')->nullable();
+            $table->string('item_name')->index();
+            $table->string('variant_value')->nullable()->index();
+
             $table->integer('quantity');
             $table->integer('quantity_received')->nullable();
-            $table->string('department');
-            $table->date('return_date');
-            $table->enum('condition', ['defective', 'damaged', 'wrong_item']);
+
+            $table->string('department')->index();
+            $table->date('return_date')->index();
+
+            $table->enum('condition', ['defective', 'damaged', 'wrong_item'])->index();
+            $table->enum('return_status', ['pending', 'approved', 'rejected'])
+                ->default('pending')
+                ->index();
+
+            $table->enum('replacement_status', ['pending', 'completed'])->nullable()->index();
+
             $table->text('description')->nullable();
             $table->string('proof_image')->nullable();
-            $table->enum('return_status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->enum('replacement_status', ['pending', 'completed'])->nullable();
             $table->timestamps();
-        
-            $table->foreign('request_id')->references('id')->on('request_supplies');
-            $table->foreign('user_id')->references('id')->on('users');
-      
         });
-        
     }
 
     /**

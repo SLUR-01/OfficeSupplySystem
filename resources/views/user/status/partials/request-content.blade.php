@@ -72,28 +72,7 @@
                                 </td>  
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-700">
                                     <div class="flex items-center space-x-4">
-                                        <!-- Chairman Progress Bar -->
-                                        <div class="w-full">
-                                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                                <div class="{{ strpos($request->chairman_status, 'Approved') !== false ? 'bg-teal-500' : 'bg-gray-300' }} h-2.5 rounded-full" 
-                                                    style="width: {{ strpos($request->chairman_status, 'Approved') !== false ? '100%' : '0%' }}"></div>
-                                            </div>
-                                            <span class="block mt-2 text-md text-center font-medium {{ strpos($request->chairman_status, 'Approved') !== false ? 'text-teal-600 font-semibold' : 'text-gray-500' }}">
-                                                <i class="fas fa-user-tie"></i>
-                                            </span>
-                                        </div>
-                                
-                                        <!-- Dean Progress Bar -->
-                                        <div class="w-full">
-                                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                                <div class="{{ strpos($request->dean_status, 'Approved') !== false ? 'bg-teal-500' : 'bg-gray-300' }} h-2.5 rounded-full" 
-                                                    style="width: {{ strpos($request->dean_status, 'Approved') !== false ? '100%' : '0%' }}"></div>
-                                            </div>
-                                            <span class="block text-center mt-2 text-md font-medium {{ strpos($request->dean_status, 'Approved') !== false ? 'text-teal-600 font-semibold' : 'text-gray-500' }}">
-                                                <i class="fas fa-user-graduate"></i>
-                                            </span>
-                                        </div>
-                                
+    
                                         <!-- Admin Progress Bar -->
                                         <div class="w-full">
                                             <div class="w-full bg-gray-200 rounded-full h-2.5">

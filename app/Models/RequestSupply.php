@@ -11,7 +11,7 @@ class RequestSupply extends Model
     use HasFactory;
 
     protected $table = 'request_supplies';  // Define the table name (optional if it follows Laravel convention)
-    
+
     protected $fillable = [
         'requester_name',
         'user_id',
@@ -22,8 +22,6 @@ class RequestSupply extends Model
         'description',
         'signature',
         'variant_value',
-        'chairman_status',
-        'dean_status',
         'admin_status',
         'withdrawal_status',
         'date_needed',
@@ -34,20 +32,16 @@ class RequestSupply extends Model
     {
         return $this->belongsTo(Stock::class, 'item_name', 'item_name');
     }
-    public function return(): HasOne
-    {
-        return $this->hasOne(ReturnRequest::class, 'request_id');
-    }
+    // public function return(): HasOne
+    // {
+    //     return $this->hasOne(ReturnRequest::class, 'request_id');
+    // }
     public function returnRequests()
     {
         return $this->hasMany(ReturnRequest::class, 'request_id');
     }
-        public function returns()
+    public function returns()
     {
         return $this->hasMany(ReturnRequest::class, 'request_id'); // adjust foreign key if needed
     }
-
-
-
-
 }

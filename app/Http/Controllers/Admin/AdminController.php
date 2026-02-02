@@ -8,23 +8,24 @@ use Illuminate\Http\Request;
 use App\Models\RequestSupply;
 use App\Models\ReturnRequest;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash; 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+
 class AdminController extends Controller
 
 {
-  
+
     public function requests()
     {
         // Use paginate() without get()
         $requests = RequestSupply::orderBy('withdrawal_status', 'asc')
-        ->get();
-    
+            ->get();
+
         return view('admin.requests', compact('requests'))->with('success', 'Request Approved Successfully!');
     }
-  
+
     public function create()
     {
         return view('admin.requests.create');
@@ -34,7 +35,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'user_id' => 'required|integer',
-            
+
             'requester_name' => 'required|string',
             'department' => 'required|string',
             'item_name' => 'required|string',
@@ -50,7 +51,7 @@ class AdminController extends Controller
 
     public function update(HttpRequest $request, $id)
     {
-       
+
         $request->validate([
             'department' => 'required|string|max:255',
             'item_name' => 'required|string|max:255',
@@ -59,10 +60,10 @@ class AdminController extends Controller
             'description' => 'nullable|string|max:1000',
         ]);
 
-       
+
         $request = RequestSupply::findOrFail($id);
 
-      
+
         $request->update([
             'department' => $request->department,
             'item_name' => $request->item_name,
@@ -71,13 +72,13 @@ class AdminController extends Controller
             'description' => $request->description,
         ]);
 
-        
+
         return redirect()->back()->with('success', 'Request updated successfully!');
     }
 
 
     public function dashboard()
-    {  
+    {
         // Fetching required data
         $totalRequesters = RequestSupply::distinct('id')->count();
         $totalUsers = RequestSupply::distinct('user_id')->count();
@@ -90,7 +91,7 @@ class AdminController extends Controller
         // Fetch stocks data
         $stocks = Stock::orderBy('item_name')->get();
         $itemNames = $stocks->pluck('item_name');
-        $quantities = $stocks->pluck('stock_quantity'); 
+        $quantities = $stocks->pluck('stock_quantity');
 
         // Fetch yearly request data
         $yearlyData = RequestSupply::selectRaw('YEAR(datetime) as year, COUNT(*) as total')
@@ -114,65 +115,65 @@ class AdminController extends Controller
             })
             ->toArray();
 
-       // Fetch department data with time filters
-$availableYears = RequestSupply::selectRaw('YEAR(datetime) as year')
-    ->groupBy('year')
-    ->orderBy('year', 'DESC')
-    ->pluck('year');
+        // Fetch department data with time filters
+        $availableYears = RequestSupply::selectRaw('YEAR(datetime) as year')
+            ->groupBy('year')
+            ->orderBy('year', 'DESC')
+            ->pluck('year');
 
-// Default department data (all time)
-$departmentData = RequestSupply::selectRaw('department, COUNT(*) as total')
-    ->groupBy('department')
-    ->orderBy('total', 'DESC')
-    ->pluck('total', 'department')
-    ->toArray();
+        // Default department data (all time)
+        $departmentData = RequestSupply::selectRaw('department, COUNT(*) as total')
+            ->groupBy('department')
+            ->orderBy('total', 'DESC')
+            ->pluck('total', 'department')
+            ->toArray();
 
-// Yearly data by department
-$yearlyDeptData = RequestSupply::selectRaw('YEAR(datetime) as year, department, COUNT(*) as total')
-    ->groupBy('year', 'department')
-    ->orderBy('year')
-    ->get()
-    ->groupBy('year') // Group by year first
-    ->map(function ($yearData) {
-        return $yearData->pluck('total', 'department'); // Then pluck department => count for each year
-    })
-    ->toArray();
+        // Yearly data by department
+        $yearlyDeptData = RequestSupply::selectRaw('YEAR(datetime) as year, department, COUNT(*) as total')
+            ->groupBy('year', 'department')
+            ->orderBy('year')
+            ->get()
+            ->groupBy('year') // Group by year first
+            ->map(function ($yearData) {
+                return $yearData->pluck('total', 'department'); // Then pluck department => count for each year
+            })
+            ->toArray();
 
-// Monthly data by department
-$monthlyDeptData = RequestSupply::selectRaw('YEAR(datetime) as year, MONTH(datetime) as month, department, COUNT(*) as total')
-    ->groupBy('year', 'month', 'department')
-    ->orderBy('year')
-    ->orderBy('month')
-    ->get()
-    ->groupBy(['year', 'month']) // Group by year and month
-    ->map(function ($yearData) {
-        return $yearData->map(function ($monthData) {
-            return $monthData->pluck('total', 'department');
-        });
-    })
-    ->toArray();
+        // Monthly data by department
+        $monthlyDeptData = RequestSupply::selectRaw('YEAR(datetime) as year, MONTH(datetime) as month, department, COUNT(*) as total')
+            ->groupBy('year', 'month', 'department')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get()
+            ->groupBy(['year', 'month']) // Group by year and month
+            ->map(function ($yearData) {
+                return $yearData->map(function ($monthData) {
+                    return $monthData->pluck('total', 'department');
+                });
+            })
+            ->toArray();
 
-// Daily data by department
-$dailyDeptData = RequestSupply::selectRaw('YEAR(datetime) as year, MONTH(datetime) as month, DAY(datetime) as day, department, COUNT(*) as total')
-    ->groupBy('year', 'month', 'day', 'department')
-    ->orderBy('year')
-    ->orderBy('month')
-    ->orderBy('day')
-    ->get()
-    ->groupBy(['year', 'month']) // Group by year and month first
-    ->map(function ($yearData) {
-        return $yearData->map(function ($monthData) {
-            return $monthData->groupBy('day')->map(function ($dayData) {
-                return $dayData->pluck('total', 'department');
-            });
-        });
-    })
-    ->toArray();
+        // Daily data by department
+        $dailyDeptData = RequestSupply::selectRaw('YEAR(datetime) as year, MONTH(datetime) as month, DAY(datetime) as day, department, COUNT(*) as total')
+            ->groupBy('year', 'month', 'day', 'department')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->orderBy('day')
+            ->get()
+            ->groupBy(['year', 'month']) // Group by year and month first
+            ->map(function ($yearData) {
+                return $yearData->map(function ($monthData) {
+                    return $monthData->groupBy('day')->map(function ($dayData) {
+                        return $dayData->pluck('total', 'department');
+                    });
+                });
+            })
+            ->toArray();
         $year = request()->get('year', now()->year);
         $month = request()->get('month', now()->month);
 
-$inventorySummary = DB::table('stocks as s')
-    ->leftJoin(DB::raw("(
+        $inventorySummary = DB::table('stocks as s')
+            ->leftJoin(DB::raw("(
         SELECT 
             rs.item_name, 
             rs.variant_value, 
@@ -187,10 +188,10 @@ $inventorySummary = DB::table('stocks as s')
         AND MONTH(rs.created_at) = $month
         GROUP BY rs.item_name, rs.variant_value, rs.user_id, u.name
     ) as rw"), function ($join) {
-        $join->on('s.item_name', '=', 'rw.item_name')
-             ->on(DB::raw('IFNULL(s.variant_value, "")'), '=', DB::raw('IFNULL(rw.variant_value, "")'));
-    })
-    ->leftJoin(DB::raw("(
+                $join->on('s.item_name', '=', 'rw.item_name')
+                    ->on(DB::raw('IFNULL(s.variant_value, "")'), '=', DB::raw('IFNULL(rw.variant_value, "")'));
+            })
+            ->leftJoin(DB::raw("(
         SELECT 
             r.item_name, 
             r.variant_value, 
@@ -205,11 +206,11 @@ $inventorySummary = DB::table('stocks as s')
         AND MONTH(r.created_at) = $month
         GROUP BY r.item_name, r.variant_value, rs.user_id, u.name
     ) as rr"), function ($join) {
-        $join->on('s.item_name', '=', 'rr.item_name')
-             ->on(DB::raw('IFNULL(s.variant_value, "")'), '=', DB::raw('IFNULL(rr.variant_value, "")'))
-             ->on('rw.user_id', '=', 'rr.user_id');
-    })
-    ->leftJoin(DB::raw("(
+                $join->on('s.item_name', '=', 'rr.item_name')
+                    ->on(DB::raw('IFNULL(s.variant_value, "")'), '=', DB::raw('IFNULL(rr.variant_value, "")'))
+                    ->on('rw.user_id', '=', 'rr.user_id');
+            })
+            ->leftJoin(DB::raw("(
         SELECT 
             r.item_name, 
             r.variant_value, 
@@ -222,44 +223,44 @@ $inventorySummary = DB::table('stocks as s')
         AND MONTH(r.created_at) = $month
         GROUP BY r.item_name, r.variant_value, rs.user_id
     ) as rep"), function ($join) {
-        $join->on('s.item_name', '=', 'rep.item_name')
-             ->on(DB::raw('IFNULL(s.variant_value, "")'), '=', DB::raw('IFNULL(rep.variant_value, "")'))
-             ->on('rw.user_id', '=', 'rep.user_id');
-    })
-   ->select(
-    's.item_name',
-    's.variant_value',
-    'rw.user_id',
-    'rw.user_name',
-    DB::raw('GREATEST(COALESCE(rw.monthly_withdrawn, 0) - COALESCE(rr.monthly_returned, 0), 0) as monthly_withdrawn'),
+                $join->on('s.item_name', '=', 'rep.item_name')
+                    ->on(DB::raw('IFNULL(s.variant_value, "")'), '=', DB::raw('IFNULL(rep.variant_value, "")'))
+                    ->on('rw.user_id', '=', 'rep.user_id');
+            })
+            ->select(
+                's.item_name',
+                's.variant_value',
+                'rw.user_id',
+                'rw.user_name',
+                DB::raw('GREATEST(COALESCE(rw.monthly_withdrawn, 0) - COALESCE(rr.monthly_returned, 0), 0) as monthly_withdrawn'),
 
-    DB::raw('COALESCE(rep.monthly_replacement, 0) as monthly_replacement'),
-        DB::raw("CASE 
+                DB::raw('COALESCE(rep.monthly_replacement, 0) as monthly_replacement'),
+                DB::raw("CASE 
                 WHEN rep.monthly_replacement = 'completed' 
                 THEN COALESCE(rr.monthly_returned, 0) 
                 ELSE 0 
                 END as monthly_returned"),
 
-)
+            )
 
 
 
-    ->whereNotNull('rw.user_id')
-    ->orderBy('rw.user_name')
-    ->orderBy('s.item_name')
-    ->get();
+            ->whereNotNull('rw.user_id')
+            ->orderBy('rw.user_name')
+            ->orderBy('s.item_name')
+            ->get();
 
 
-     
+
 
         return view('admin.dashboard', compact(
-            'stocks', 
-            'itemNames', 
-            'quantities', 
-            'totalRequesters', 
-            'totalUsers', 
-            'totalItems', 
-            'totalPending', 
+            'stocks',
+            'itemNames',
+            'quantities',
+            'totalRequesters',
+            'totalUsers',
+            'totalItems',
+            'totalPending',
             'totalCompleted',
             'yearlyData', // Added this
             'monthlyData',
@@ -274,7 +275,7 @@ $inventorySummary = DB::table('stocks as s')
             'inventorySummary',
             'year',
             'month',
-  
+
         ));
     }
 
@@ -299,11 +300,11 @@ $inventorySummary = DB::table('stocks as s')
             // Validate the input data
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+                'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
                 'role' => 'required|in:user,chairman,dean,admin',
                 'department' => 'required|in:COT,COED,COHTM',
             ]);
-    
+
             // Update the user
             $user->update([
                 'name' => $validated['name'],
@@ -311,7 +312,7 @@ $inventorySummary = DB::table('stocks as s')
                 'role' => $validated['role'],
                 'department' => $validated['department']
             ]);
-    
+
             // Return JSON response
             return response()->json([
                 'success' => true,
@@ -324,7 +325,6 @@ $inventorySummary = DB::table('stocks as s')
                     'department' => $user->department
                 ]
             ]);
-    
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -338,12 +338,12 @@ $inventorySummary = DB::table('stocks as s')
     {
         $user = User::findOrFail($id);
         $user->delete();
-    
+
         return response()->json(['success' => true, 'message' => 'User deleted successfully.']);
     }
-    
 
-    
+
+
     public function storeUser(Request $request)
     {
         // Validate the input data
@@ -361,17 +361,17 @@ $inventorySummary = DB::table('stocks as s')
             'role' => 'required|in:user,chairman,dean,admin',
             'department' => 'required|in:COT,COED,COHTM',
         ]);
-    
+
         // Ensure password is not the same as email
         if ($request->input('email') === $request->input('password')) {
             return back()->withErrors(['password' => 'Password cannot be the same as the email.']);
         }
-    
+
         // Ensure password is not the same as username
         if ($request->input('name') === $request->input('password')) {
             return back()->withErrors(['password' => 'Password cannot be the same as the username.']);
         }
-    
+
         // Create the user
         $user = User::create([
             'name' => $validated['name'],
@@ -380,7 +380,7 @@ $inventorySummary = DB::table('stocks as s')
             'role' => $validated['role'],
             'department' => $validated['department']
         ]);
-    
+
         // Return JSON if request is AJAX (from JS)
         if ($request->expectsJson()) {
             return response()->json([
@@ -388,11 +388,10 @@ $inventorySummary = DB::table('stocks as s')
                 'message' => 'User created successfully!'
             ]);
         }
-    
+
         // Otherwise, fallback to normal redirect
         return redirect()->route('admin.users')->with('success', 'User created successfully!');
     }
-    
 }
 
 
