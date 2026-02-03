@@ -27,34 +27,58 @@ class RequestSupplyController extends Controller
     public function storeRequest(Request $request)
     {
         try {
-            // Validate the request data
+            // Validate the main request data
             $validated = $request->validate([
                 'user_id' => 'required|exists:users,id',
                 'requester_name' => 'required|string',
                 'department' => 'required|string',
-                'item_name' => 'required|string',
-                'variant_value' => 'nullable|string', // Add this line
-                'quantity' => 'required|integer|min:1',
                 'datetime' => 'required|date',
-                'description' => 'nullable|string',
                 'date_needed' => 'required|date|after_or_equal:today',
+                'description' => 'nullable|string',
                 'signature' => 'required|string',
+
+                // Validate the items array
+                'items' => 'required|array|min:1',
+                'items.*.stock_id' => 'required|exists:stocks,id',
+                'items.*.item_name' => 'required|string',
+                'items.*.variant_value' => 'nullable|string',
+                'items.*.quantity' => 'required|integer|min:1',
             ]);
 
-            // Store the request in the database
-            $newRequest = RequestSupply::create($validated);
+            // Create the main request
+            $newRequest = RequestSupply::create([
+                'user_id' => $validated['user_id'],
+                'requester_name' => $validated['requester_name'],
+                'department' => $validated['department'],
+                'datetime' => $validated['datetime'],
+                'date_needed' => $validated['date_needed'],
+                'description' => $validated['description'] ?? null,
+                'signature' => $validated['signature'],
+            ]);
 
-            // Send email notification
+            // Loop through items and store them
+            foreach ($validated['items'] as $item) {
+                $newRequest->requestItems()->create([
+                    'stock_id' => $item['stock_id'],
+                    'item_name' => $item['item_name'],
+                    'variant_value' => $item['variant_value'] ?? null,
+                    'quantity' => $item['quantity'],
+                ]);
+
+                // Optional: deduct stock immediately
+                $stock = Stock::find($item['stock_id']);
+                if ($stock) {
+                    $stock->decrement('stock_quantity', $item['quantity']);
+                }
+            }
+
+            // Optional: send email notification
             $recipientEmail = [
                 'pagulakert@gmail.com',
-                // 'kertjohnpagula9@gmail.com',
-                // 'pagula.kertjohn@llcc.edu.ph'
+                // other emails...
             ];
 
-            // Or you could get it from the user: $request->user()->email;
-
-            // Mail::to($recipientEmail)
-            //     ->send(new NewRequestNotification($newRequest));
+            // Mail::to($recipientEmail)->send(new NewRequestNotification($newRequest));
 
             return redirect()->route('user.request')->with('success', 'Request submitted successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {
