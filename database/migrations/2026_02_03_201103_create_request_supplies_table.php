@@ -20,10 +20,7 @@ return new class extends Migration
             $table->string('requester_name');
             $table->string('department')->index();
 
-            $table->string('item_name')->index();
-            $table->string('variant_value')->index();
 
-            $table->integer('quantity');
             $table->dateTime('datetime')->index();
 
             $table->longText('signature');

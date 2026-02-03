@@ -24,10 +24,10 @@ class RequestSupplyController extends Controller
         return view('user.request', compact('requests', 'stocks'));
     }
 
+
     public function storeRequest(Request $request)
     {
         try {
-            // Validate the main request data
             $validated = $request->validate([
                 'user_id' => 'required|exists:users,id',
                 'requester_name' => 'required|string',
@@ -36,8 +36,6 @@ class RequestSupplyController extends Controller
                 'date_needed' => 'required|date|after_or_equal:today',
                 'description' => 'nullable|string',
                 'signature' => 'required|string',
-
-                // Validate the items array
                 'items' => 'required|array|min:1',
                 'items.*.stock_id' => 'required|exists:stocks,id',
                 'items.*.item_name' => 'required|string',
@@ -56,7 +54,7 @@ class RequestSupplyController extends Controller
                 'signature' => $validated['signature'],
             ]);
 
-            // Loop through items and store them
+            // Save each item
             foreach ($validated['items'] as $item) {
                 $newRequest->requestItems()->create([
                     'stock_id' => $item['stock_id'],
@@ -65,20 +63,10 @@ class RequestSupplyController extends Controller
                     'quantity' => $item['quantity'],
                 ]);
 
-                // Optional: deduct stock immediately
+                // Optional: Deduct stock
                 $stock = Stock::find($item['stock_id']);
-                if ($stock) {
-                    $stock->decrement('stock_quantity', $item['quantity']);
-                }
+                if ($stock) $stock->decrement('stock_quantity', $item['quantity']);
             }
-
-            // Optional: send email notification
-            $recipientEmail = [
-                'pagulakert@gmail.com',
-                // other emails...
-            ];
-
-            // Mail::to($recipientEmail)->send(new NewRequestNotification($newRequest));
 
             return redirect()->route('user.request')->with('success', 'Request submitted successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -89,10 +77,9 @@ class RequestSupplyController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'An error occurred. Please try again.');
+                ->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
-
     public function history(Request $request)
     {
         $user_id = Auth::id();

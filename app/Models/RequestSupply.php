@@ -16,12 +16,9 @@ class RequestSupply extends Model
         'requester_name',
         'user_id',
         'department',
-        'item_name',
-        'quantity',
         'datetime',
         'description',
         'signature',
-        'variant_value',
         'admin_status',
         'withdrawal_status',
         'date_needed',
@@ -32,6 +29,12 @@ class RequestSupply extends Model
     {
         return $this->belongsTo(Stock::class, 'item_name', 'item_name');
     }
+
+    public function requestItems()
+    {
+        return $this->hasMany(RequestItem::class, 'request_supply_id');
+    }
+
     // public function return(): HasOne
     // {
     //     return $this->hasOne(ReturnRequest::class, 'request_id');
