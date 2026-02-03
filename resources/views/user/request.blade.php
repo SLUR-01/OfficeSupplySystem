@@ -65,19 +65,38 @@
                 </div>
 
                 <!-- Signature & Description -->
-                <div class="flex flex-col md:flex-row gap-4 mb-6">
-                    <div class="flex-1">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Signature</label>
-                        <div class="flex items-center border border-gray-300 rounded-md bg-gray-100 p-2 h-[200px]">
-                            <canvas id="signatureCanvas" class="w-full h-full bg-white rounded-md cursor-pointer"></canvas>
-                        </div>
-                        <input type="hidden" name="signature" id="signatureInput">
-                    </div>
+                <div>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <!-- Signature Section -->
+                        <div class="flex-1">
+                            <label for="signature" class="block text-sm font-medium text-gray-700 mb-1">Signature</label>
+                            <div class="flex items-center border border-gray-300 rounded-md bg-gray-100 p-2 h-[200px]">
+                                <canvas id="signatureCanvas"
+                                    class="w-full h-full bg-white rounded-md cursor-pointer"></canvas>
 
-                    <div class="flex-1">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <textarea name="description" placeholder="Provide additional details..."
-                            class="w-full h-[200px] p-2 rounded-md border border-gray-300 bg-gray-100 resize-none"></textarea>
+                            </div>
+                            <div class="flex justify-end items-center ">
+                                <button type="button" id="clearSignature"
+                                    class="px-2 py-1 text-[red] rounded-md bg-[white]">
+                                    <i class="fas fa-trash mr-2"></i>Clear
+                                </button>
+                                <button type="button" id="loadSignature"
+                                    class="px-2 py-1 text-[blue] bg-[white] rounded-md">
+                                    <i class="fas fa-save mr-2"></i>Paste
+                                </button>
+                            </div>
+                            <input type="hidden" name="signature" id="signatureInput">
+                        </div>
+
+                        <!-- Description Section -->
+                        <div class="flex-1">
+                            <label for="description"
+                                class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <div class="flex items-center border rounded-md bg-gray-100 p-2 h-[200px]">
+                                <textarea id="description" name="description" placeholder="Provide additional details..."
+                                    class="w-full h-full bg-transparent border-0 cursor-pointer outline-none resize-none"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
