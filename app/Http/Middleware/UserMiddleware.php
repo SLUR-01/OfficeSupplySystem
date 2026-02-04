@@ -16,13 +16,14 @@ class UserMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check()) {
-            $role = Auth::user()->role; // Retrieve the role of the authenticated user
-            if ('user' === $role) {
-                return $next($request);
-            }
-            abort(401);
+        if (!Auth::check()) {
+            abort(401); // Not logged in
         }
-        abort(401);
+
+        if (Auth::user()->role !== 'user') {
+            abort(403); // Logged in but not user
+        }
+
+        return $next($request);
     }
 }

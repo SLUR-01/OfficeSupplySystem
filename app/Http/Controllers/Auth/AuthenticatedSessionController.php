@@ -40,13 +40,18 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
-
         // Redirect based on role
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
-        } elseif ($user->role === 'user') {
+        }
+
+        if ($user->role === 'user') {
             return redirect()->route('user.dashboard');
         }
+
+        // Fallback for deleted/invalid roles
+        Auth::logout();
+        abort(403, 'Unauthorized role');
     }
 
 
