@@ -46,16 +46,17 @@
                 <table class="min-w-full bg-white divide-y divide-gray-200">
                     <thead class="bg-white tracking-wide font-medium">
                         <tr>
-                            <th class="px-2 py-3 text-left text-sm text-gray-600 uppercase">Id.</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Req. Name</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Dept.</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Item Name</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Qty.</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Date Submitted</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Date Needed</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Desc.</th>
-                            <th class="px-3 py-3 text-center text-sm text-gray-600 uppercase">Approval</th>
-                            <th class="px-3 py-3 text-center text-sm text-gray-600 uppercase">Action</th>
+                            <th class="px-2 py-3 text-left text-sm text-gray-600">ID</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Name</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Dept.</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Item name</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Variant</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Quantity.</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Signature</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Submitted</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Needed</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Purpose</th>
+                            <th class="px-3 py-3 text-center text-sm text-gray-600 ">Action</th>
                         </tr>
                     </thead>
                     <tbody id="requestsTbody" class="bg-white divide-y divide-gray-200">
@@ -71,18 +72,48 @@
                                 <td class="px-2 py-4 text-sm text-gray-800 text-left">{{ $request->user_id }}</td>
                                 <td class="px-3 py-4 text-sm text-gray-800 capitalize">{{ $request->requester_name }}</td>
                                 <td class="px-3 py-4 text-sm text-gray-800 capitalize">{{ $request->department }}</td>
+                                <!-- Item Name Column -->
                                 <td class="px-3 py-4 whitespace-nowrap text-sm text-dark capitalize">
-                                    <div>
-                                        <!-- Bold item name -->
-                                        <span class="font-bold ">{{ $request->item_name }}</span>
-
-                                        <!-- Colored variant value on new line -->
-                                        @if ($request->variant_value)
-                                            <div class="text-gray-500">{{ $request->variant_value }}</div>
-                                        @endif
-                                    </div>
+                                    @if ($request->items && $request->items->count() > 0)
+                                        @foreach ($request->items as $item)
+                                            <div class="mb-1">{{ $item->item_name }}</div>
+                                        @endforeach
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
                                 </td>
-                                <td class="px-3 py-4 text-sm text-gray-800 capitalize">{{ $request->quantity }}</td>
+
+                                <!-- Variant Column -->
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                                    @if ($request->items && $request->items->count() > 0)
+                                        @foreach ($request->items as $item)
+                                            <div class="mb-1">{{ $item->variant_value }}</div>
+                                        @endforeach
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
+
+                                <!-- Quantity Column -->
+                                <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-800 capitalize">
+                                    @if ($request->items && $request->items->count() > 0)
+                                        @foreach ($request->items as $item)
+                                            <div class="mb-1">{{ $item->quantity }}</div>
+                                        @endforeach
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-3 py-4 text-sm text-gray-800 max-w-xs truncate">
+                                    @if ($request->signature)
+                                        <img src="{{ $request->signature }}" alt="Signature"
+                                            class="h-12 w-auto border rounded">
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
+
+
                                 <td class="px-3 py-4 whitespace-nowrap capitalize">
                                     <div class="text-sm text-gray-800">
                                         <!-- Date (top line) -->
@@ -106,11 +137,7 @@
                                     title="{{ $request->description }}">
                                     {{ $request->description }}
                                 </td>
-                                <td class="px-3 py-4 whitespace-nowrap text-sm">
-                                    <div class="flex justify-center items-center space-x-2">
 
-                                    </div>
-                                </td>
                                 <td class="px-3 py-4 text-sm">
                                     <div class="flex justify-center">
                                         <button

@@ -15,15 +15,13 @@ return new class extends Migration
         if (!Schema::hasTable('stocks')) {
             Schema::create('stocks', function (Blueprint $table) {
                 $table->id();
-                $table->string('item_name')->index();
-                $table->integer('stock_quantity')->default(0)->index();
+                $table->string('item_name');
+                $table->integer('current_stock')->default(0);
+                $table->integer('remaining_stocks')->default(0);
                 $table->integer('reorderpoint')->default(0);
-                $table->string('variant_type')->nullable();
-                $table->string('variant_value')->nullable();
+                $table->string('variant_type')->nullable()->comment('e.g., color, size, type');
+                $table->string('variant_value')->nullable()->comment('e.g., red, blue, long, short');
                 $table->timestamps();
-
-                // Prevent duplicate variants per item
-                $table->index(['item_name', 'variant_value']);
             });
         }
     }

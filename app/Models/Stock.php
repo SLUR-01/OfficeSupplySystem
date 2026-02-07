@@ -10,21 +10,34 @@ class Stock extends Model
     use HasFactory;
 
     protected $fillable =
-     [
+    [
 
         'item_name',
         'variant_type',
         'variant_value',
-        'stock_quantity',
+        'current_stock',
+        'remaining_stocks',
         'reorderpoint',
 
     ];
-public $incrementing = false;
-protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $primaryKey = 'id';
+
+    public function requestItems()
+    {
+        return $this->hasMany(RequestItem::class);
+    }
 
     public function requests()
-{
-    return $this->hasMany(RequestSupply::class, 'item_name', 'item_name');
-}
-    
+    {
+        // All requests that contain this stock
+        return $this->hasManyThrough(
+            RequestSupply::class,
+            RequestItem::class,
+            'stock_id',       // Foreign key on RequestItem table
+            'id',             // Foreign key on RequestSupply table
+            'id',             // Local key on Stock
+            'request_supply_id' // Local key on RequestItem
+        );
+    }
 }

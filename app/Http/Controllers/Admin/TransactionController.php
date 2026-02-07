@@ -14,6 +14,7 @@ class TransactionController extends Controller
     public function withdrawal()
     {
         $requests = RequestSupply::whereIn('withdrawal_status', ['Processing', 'Ready to Pick Up'])
+            ->where('admin_status', 'Approved')
             ->orderBy('date_needed', 'asc')
             ->get();
 
@@ -28,34 +29,35 @@ class TransactionController extends Controller
                 'withdrawal_status' => 'required|in:Pending,Processing,Ready to Pick Up,Completed',
                 'withdrawn_by' => 'required_if:withdrawal_status,Completed|string|max:255',
                 'completed_at' => 'required_if:withdrawal_status,Completed|date',
-
             ]);
 
-            $supplyRequest = RequestSupply::findOrFail($id);
+            $supplyRequest = RequestSupply::with('items')->findOrFail($id);
 
-            // Handle stock deduction when changing to "Ready to Pick Up"
+            // Handle stock deduction when changing to "Completed"
             if ($request->withdrawal_status === 'Completed' && $supplyRequest->withdrawal_status !== 'Completed') {
-                $stock = Stock::where('item_name', $supplyRequest->item_name)
-                    ->where('variant_value', $supplyRequest->variant_value) // Add variant condition
-                    ->first();
+                foreach ($supplyRequest->items as $item) {
+                    $stock = Stock::where('item_name', $item->item_name)
+                        ->where('variant_value', $item->variant_value)
+                        ->first();
 
-                if (!$stock) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Item with specified variant not found in stock inventory.'
-                    ], 400);
+                    if (!$stock) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Item '{$item->item_name}' with variant '{$item->variant_value}' not found in stock inventory."
+                        ], 400);
+                    }
+
+                    if ($stock->remaining_stocks < $item->quantity) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Insufficient stock for '{$item->item_name}' ({$item->variant_value}). Only {$stock->remaining_stocks} available."
+                        ], 400);
+                    }
+
+                    // Deduct the stock
+                    $stock->remaining_stocks -= $item->quantity;
+                    $stock->save();
                 }
-
-                if ($stock->stock_quantity < $supplyRequest->quantity) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Insufficient stock available for this variant. Only ' . $stock->stock_quantity . ' remaining.'
-                    ], 400);
-                }
-
-                // Deduct the stock
-                $stock->stock_quantity -= $supplyRequest->quantity;
-                $stock->save();
             }
 
             // Handle completion status
@@ -88,6 +90,7 @@ class TransactionController extends Controller
             return back()->with('error', 'Error updating status: ' . $e->getMessage());
         }
     }
+
     public function withdrawnBy(Request $request, $id)
     {
         try {
@@ -202,7 +205,7 @@ class TransactionController extends Controller
                     ->first();
 
                 if ($stock) {
-                    $stock->stock_quantity -= $return->quantity_received;
+                    $stock->current_stock -= $return->quantity_received;
                     $stock->save();
                 } else {
                     return response()->json([
@@ -246,7 +249,7 @@ class TransactionController extends Controller
                 ], 400);
             }
 
-            $currentStock = $stock->stock_quantity; // Make sure this matches your DB column name
+            $currentStock = $stock->current_stock; // Make sure this matches your DB column name
             $returnQuantity = $return->quantity;
 
             // Check if approving would result in negative stock

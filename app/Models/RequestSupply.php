@@ -25,14 +25,10 @@ class RequestSupply extends Model
         'completed_at' => 'datetime',
         'withdrawn_by',
     ];
-    public function stockItem()
-    {
-        return $this->belongsTo(Stock::class, 'item_name', 'item_name');
-    }
 
-    public function requestItems()
+    public function items()
     {
-        return $this->hasMany(RequestItem::class, 'request_supply_id');
+        return $this->hasMany(RequestItem::class);
     }
 
     // public function return(): HasOne

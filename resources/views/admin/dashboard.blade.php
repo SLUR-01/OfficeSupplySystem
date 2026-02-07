@@ -1,11 +1,9 @@
 @extends('layouts.admin')
 
 @section('content')
- 
-     
-<div class="main-container h-full bg-gray-100 p-3">
+    <div class="main-container h-full bg-gray-100 p-3">
 
-    <div class="transition-opacity duration-300">
+        {{-- <div class="transition-opacity duration-300">
 
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
             <div>
@@ -134,7 +132,7 @@
                     <div class="w-full md:w-1/2">
                         <select id="yearFilterDept" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <option value="all">All Years</option>
-                            @foreach($availableYears as $year)
+                            @foreach ($availableYears as $year)
                                 <option value="{{ $year }}">{{ $year }}</option>
                             @endforeach
                         </select>
@@ -188,7 +186,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            @foreach($inventorySummary as $row)
+                            @foreach ($inventorySummary as $row)
                             <tr class="hover:bg-gray-100 transition">
                                 <td class="px-3 py-3 text-sm text-gray-800">{{ $row->user_id }}</td>
                                 <td class="px-3 py-3 text-sm text-gray-800 capitalize">{{ $row->user_name }}</td>
@@ -210,11 +208,11 @@
                 </div>
             </div>
         </div>
+    </div> --}}
     </div>
-</div>
 
 
-<script>
+    {{-- <script>
   
     
 
@@ -557,7 +555,5 @@ document.getElementById('monthFilterDept').addEventListener('change', function (
 
 
    
-
-
-
+ --}}
 @endsection

@@ -56,7 +56,7 @@ class RequestSupplyController extends Controller
 
             // Save each item
             foreach ($validated['items'] as $item) {
-                $newRequest->requestItems()->create([
+                $newRequest->items()->create([
                     'stock_id' => $item['stock_id'],
                     'item_name' => $item['item_name'],
                     'variant_value' => $item['variant_value'] ?? null,
@@ -65,7 +65,7 @@ class RequestSupplyController extends Controller
 
                 // Optional: Deduct stock
                 $stock = Stock::find($item['stock_id']);
-                if ($stock) $stock->decrement('stock_quantity', $item['quantity']);
+                if ($stock) $stock->decrement('current_stock', $item['quantity']);
             }
 
             return redirect()->route('user.request')->with('success', 'Request submitted successfully!');

@@ -149,15 +149,15 @@
                         <option value="" disabled selected>Select an item</option>
                         @foreach ($stocks as $stock)
                             @php
-                                $isOutOfStock = $stock->stock_quantity <= 0;
-                                $isLowStock = $stock->stock_quantity > 0 && $stock->stock_quantity <= 10;
+                                $isOutOfStock = $stock->current_stock <= 0;
+                                $isLowStock = $stock->current_stock > 0 && $stock->current_stock <= 10;
                                 $variantDisplay = $stock->variant_value ? " ({$stock->variant_value})" : '';
                                 $stockStatus = $isOutOfStock ? ' (Out of stock)' : ($isLowStock ? ' (Low stock)' : '');
                             @endphp
                             <option value="{{ $stock->id }}" {{ $isOutOfStock ? 'disabled' : '' }}
                                 data-item-name="{{ $stock->item_name }}"
                                 data-variant-value="{{ $stock->variant_value ?? '' }}"
-                                data-current-stock="{{ $stock->stock_quantity }}">
+                                data-current-stock="{{ $stock->current_stock }}">
                                 {{ $stock->item_name }}{{ $variantDisplay }}{{ $stockStatus }}
                             </option>
                         @endforeach
@@ -290,6 +290,7 @@
 
                 selectedItems.forEach((item, index) => {
                     const tr = document.createElement('tr');
+
                     tr.innerHTML = `
             <td class="border px-3 py-2">
                 ${item.item_name}
@@ -304,9 +305,11 @@
                 <button type="button" onclick="removeItem(${item.stock_id})" class="text-red-600 hover:underline">Remove</button>
             </td>
         `;
+
                     tbody.appendChild(tr);
                 });
             }
+
 
             // ---------------- Signature Canvas ----------------
             const canvas = document.getElementById('signatureCanvas');

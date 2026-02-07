@@ -43,37 +43,61 @@
                 <table class="min-w-full bg-white divide-y divide-gray-200">
                     <thead class="bg-white tracking-wide font-medium">
                         <tr>
-                            <th class="py-3 text-center text-sm text-gray-600 uppercase">Id.</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Req. Name</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Dept.</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Item Name</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Quantity</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Date Needed</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Purpose</th>
-                            <th class="px-3 py-3 text-center text-sm text-gray-600 uppercase">Withdrawal</th>
-                            <th class="px-3 py-3 text-center text-sm text-gray-600 uppercase">Action</th>
+                            <th class="py-3 text-center text-sm text-gray-600 ">ID</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Name</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Dept</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Item name</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Variant</th>
+
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Quantity</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Date needed</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Purpose</th>
+                            <th class="px-3 py-3 text-center text-sm text-gray-600 ">Withdrawal</th>
+                            <th class="px-3 py-3 text-center text-sm text-gray-600 ">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         @foreach ($requests as $request)
-                            @if (in_array($request->withdrawal_status, ['Processing', 'Ready to Pick Up']))
+                            @if (in_array($request->withdrawal_status, ['Processing', 'Ready to Pick Up']) && $request->admin_status === 'Approved')
                                 <tr class="hover:bg-gray-50 transition" data-request-id="{{ $request->id }}">
                                     <td class="px-2 py-4 text-sm text-gray-800 text-left">{{ $request->user_id }}</td>
 
                                     <td class="px-3 text-md text-gray-800">{{ $request->requester_name }}</td>
                                     <td class="px-3 text-md text-gray-800">{{ $request->department }}</td>
+                                    <!-- Item Name Column -->
                                     <td class="px-3 py-4 whitespace-nowrap text-sm text-dark capitalize">
-                                        <div>
-                                            <!-- Bold item name -->
-                                            <span class="font-bold ">{{ $request->item_name }}</span>
-
-                                            <!-- Colored variant value on new line -->
-                                            @if ($request->variant_value)
-                                                <div class="text-gray-500">{{ $request->variant_value }}</div>
-                                            @endif
-                                        </div>
+                                        @if ($request->items && $request->items->count() > 0)
+                                            @foreach ($request->items as $item)
+                                                <div class="mb-1">{{ $item->item_name }}</div>
+                                            @endforeach
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
                                     </td>
-                                    <td class="px-3 text-md text-gray-800">{{ $request->quantity }}</td>
+
+                                    <!-- Variant Value Column -->
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        @if ($request->items && $request->items->count() > 0)
+                                            @foreach ($request->items as $item)
+                                                <div class="mb-1">{{ $item->variant_value ?? '-' }}</div>
+                                            @endforeach
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
+                                    </td>
+
+                                    <!-- Quantity Column -->
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-800">
+                                        @if ($request->items && $request->items->count() > 0)
+                                            @foreach ($request->items as $item)
+                                                <div class="mb-1">{{ $item->quantity }}</div>
+                                            @endforeach
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
+                                    </td>
+
+
                                     <td class="px-3 text-sm text-gray-800">
                                         <span class="border-b border-dark">
                                             {{ \Carbon\Carbon::parse($request->date_needed)->format('Y-m-d') }}
@@ -122,7 +146,7 @@
 
                                             @if ($request->withdrawal_status === 'Ready to Pick Up')
                                                 <button
-                                                    class="block w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-green-100"
+                                                    class="block w-full text-left px-3 py-2 text-sm text-green-700 hover:bg-green-100"
                                                     onclick="openWithdrawModal('{{ $request->id }}')">
                                                     <i class="fas fa-check-circle mr-2"></i> Mark as Completed
                                                 </button>
