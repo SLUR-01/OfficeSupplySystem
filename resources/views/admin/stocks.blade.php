@@ -39,20 +39,21 @@
         <div class="bg-white rounded-md overflow-hidden shadow-md">
             <div class="overflow-x-auto px-3">
                 <table class="min-w-full bg-white divide-y divide-gray-200">
-                    <thead class="bg-white tracking-wide font-medium">
-                        <tr>
-                            <th class="py-3 text-center text-sm text-gray-600 uppercase">Stock ID</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Item Name</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Type</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Value</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Current Stock</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Remaining Stock</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Reorder Point</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Status</th>
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr class="w-full ">
+                            <th class="py-3 py-3 text-left text-md text-gray-600">Stock Id</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600">Item name</th>
+
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Current Stock</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Reorder Point</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Remaining Stock</th>
+
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Status</th>
                             {{-- <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Defective</th>
                             <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Damaged</th> --}}
 
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Last Update</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600">Last update</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600">Action</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -60,36 +61,40 @@
                             <tr class="hover:bg-gray-50 transition duration-200" data-item-id="{{ $stock->id }}">
                                 <td class="px-2 py-3 text-gray-800 font-medium">{{ $stock->id }}</td>
 
-                                <td class="px-3 py-3 text-gray-800 font-medium">{{ $stock->item_name }}</td>
-                                <td class="px-3 py-3 text-gray-800 font-medium">{{ $stock->variant_type }}</td>
+                                <td class="px-3 py-3 text-gray-800 font-sm">
+                                    <div class="flex flex-col space-y-1">
+                                        <span class="font-semibold">{{ $stock->item_name }}</span>
+                                        <span class="text-sm text-gray-500">{{ $stock->variant_type ?? '-' }}</span>
+                                        <span class="text-sm text-gray-500">{{ $stock->variant_value ?? '-' }}</span>
+                                    </div>
+                                </td>
 
-                                <td class="px-3 py-3 text-gray-800 font-medium">{{ $stock->variant_value }}</td>
 
                                 <td class="px-3 py-3 text-left text-gray-800 font-semibold">
                                     {{ $stock->current_stock }}
 
                                 </td>
                                 <td class="px-3 py-3 text-left text-gray-800 font-semibold">
-                                    {{ $stock->remaining_stocks }}
+                                    {{ $stock->reorderpoint }}
 
                                 </td>
                                 <td class="px-3 py-3 text-left text-gray-800 font-semibold">
-                                    {{ $stock->reorderpoint }}
+                                    {{ $stock->remaining_stocks }}
 
                                 </td>
 
                                 <td class="px-3 py-3 text-left">
                                     @if ($stock->remaining_stocks == 0)
                                         <span
-                                            class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Out
+                                            class="px-5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Out
                                             of Stock</span>
                                     @elseif($stock->remaining_stocks <= $stock->reorderpoint)
                                         <span
-                                            class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Low
+                                            class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Low
                                             Stock</span>
                                     @else
                                         <span
-                                            class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">In
+                                            class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">In
                                             Stock</span>
                                     @endif
                                 </td>
@@ -170,16 +175,16 @@
                                 <option value="" disabled selected>Select an item</option>
                                 @foreach ($stocks as $stock)
                                     @php
-                                        $isLowStock = $stock->remaining_stocks <= 10;
-                                        $isOutOfStock = $stock->remaining_stocks == 0;
+                                        $isLowStock = $stock->current_stock <= 10;
+                                        $isOutOfStock = $stock->current_stock == 0;
                                     @endphp
-                                    <option value="{{ $stock->id }}" data-current="{{ $stock->remaining_stocks }}"
+                                    <option value="{{ $stock->id }}" data-current="{{ $stock->current_stock }}"
                                         class="{{ $isLowStock ? 'text-yellow-600' : '' }} {{ $isOutOfStock ? 'text-red-600' : '' }}">
                                         {{ $stock->item_name }}
                                         @if ($stock->variant_value)
                                             ({{ $stock->variant_value }})
                                         @endif
-                                        (Current:{{ $stock->remaining_stocks }})
+                                        (Current:{{ $stock->current_stock }})
                                     </option>
                                 @endforeach
                             </select>
@@ -189,7 +194,7 @@
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Quantity to Add</label>
                             <div class="relative">
-                                <input type="number" name="stock_quantity" min="1" required
+                                <input type="number" name="current_stock" min="1" required
                                     class="mt-1 p-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                                     placeholder="Enter quantity to add">
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -252,8 +257,10 @@
                                 class="block w-full rounded-md cursor-pointer border border-gray-300 bg-white py-2 px-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                                 <option value="" disabled selected>Select variant type</option>
                                 <option value="color">Color</option>
-                                <option value="type">Type</option>
                                 <option value="size">Size</option>
+                                <option value="material">Material</option>
+
+
                             </select>
                         </div>
 
@@ -277,7 +284,7 @@
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
                             <div class="relative">
-                                <input type="number" name="quantity" min="0" required
+                                <input type="number" name="current_stock" min="0" required
                                     class="mt-1 p-2 w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                                     placeholder="Enter initial quantity">
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">

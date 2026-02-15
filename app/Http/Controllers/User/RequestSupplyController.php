@@ -38,35 +38,44 @@ class RequestSupplyController extends Controller
                 'signature' => 'required|string',
                 'items' => 'required|array|min:1',
                 'items.*.stock_id' => 'required|exists:stocks,id',
-                'items.*.item_name' => 'required|string',
-                'items.*.variant_value' => 'nullable|string',
                 'items.*.quantity' => 'required|integer|min:1',
             ]);
 
-            // Create the main request
-            $newRequest = RequestSupply::create([
-                'user_id' => $validated['user_id'],
-                'requester_name' => $validated['requester_name'],
-                'department' => $validated['department'],
-                'datetime' => $validated['datetime'],
-                'date_needed' => $validated['date_needed'],
-                'description' => $validated['description'] ?? null,
-                'signature' => $validated['signature'],
-            ]);
+            // Start transaction to avoid stock conflicts
+            DB::transaction(function () use ($validated) {
 
-            // Save each item
-            foreach ($validated['items'] as $item) {
-                $newRequest->items()->create([
-                    'stock_id' => $item['stock_id'],
-                    'item_name' => $item['item_name'],
-                    'variant_value' => $item['variant_value'] ?? null,
-                    'quantity' => $item['quantity'],
+                // Create the main request
+                $newRequest = RequestSupply::create([
+                    'user_id' => $validated['user_id'],
+                    'requester_name' => $validated['requester_name'],
+                    'department' => $validated['department'],
+                    'datetime' => $validated['datetime'],
+                    'date_needed' => $validated['date_needed'],
+                    'description' => $validated['description'] ?? null,
+                    'signature' => $validated['signature'],
                 ]);
 
-                // Optional: Deduct stock
-                $stock = Stock::find($item['stock_id']);
-                if ($stock) $stock->decrement('current_stock', $item['quantity']);
-            }
+                // Save each item and reserve stock
+                foreach ($validated['items'] as $item) {
+                    $stock = Stock::findOrFail($item['stock_id']);
+
+                    // Check remaining stock before reserving
+                    if ($item['quantity'] > $stock->remaining_stocks) {
+                        throw new \Exception("Cannot request {$item['quantity']} of {$stock->item_name}. Only {$stock->remaining_stocks} available.");
+                    }
+
+                    // Create request item
+                    $newRequest->items()->create([
+                        'stock_id' => $stock->id,
+                        'item_name' => $stock->item_name,        // Copy from stock table
+                        'variant_value' => $stock->variant_value,
+                        'quantity' => $item['quantity'],
+                    ]);
+
+                    // Deduct from remaining stocks
+                    $stock->decrement('remaining_stocks', $item['quantity']);
+                }
+            });
 
             return redirect()->route('user.request')->with('success', 'Request submitted successfully!');
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -80,6 +89,7 @@ class RequestSupplyController extends Controller
                 ->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
+
     public function history(Request $request)
     {
         $user_id = Auth::id();

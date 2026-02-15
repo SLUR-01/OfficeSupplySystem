@@ -39,14 +39,11 @@ class RequestSupplyController extends Controller
                 return response()->json(['error' => "Stock not found for item: {$item->item_name}"], 400);
             }
 
-            if ($stock->current_stock < $item->quantity) {
+            if ($stock->remaining_stocks < $item->quantity) {
                 return response()->json([
                     'error' => "Insufficient stock for item: {$item->item_name}."
                 ], 400);
             }
-
-            // Deduct stock
-            $stock->decrement('current_stock', $item->quantity);
         }
 
         return response()->json(['message' => 'Request Approved Successfully!']);

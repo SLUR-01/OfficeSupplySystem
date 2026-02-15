@@ -44,49 +44,54 @@ class StockController extends Controller
         return view('admin.stocks', compact('stocks'));
     }
 
-    public function withdrawStock(Request $request)
-    {
-        $request->validate([
-            'item_id' => 'required|exists:stocks,id',
-            'quantity' => 'required|integer|min:1',
-            'withdrawal_status' => 'required|in:Pending,Processing,Ready to Pick Up,Completed',
-        ]);
+    // public function withdrawStock(Request $request)
+    // {
+    //     $request->validate([
+    //         'item_id' => 'required|exists:stocks,id',
+    //         'current_stock' => 'required|integer|min:1',
+    //         'withdrawal_status' => 'required|in:Pending,Processing,Ready to Pick Up,Completed',
+    //     ]);
 
-        $stock = Stock::findOrFail($request->item_id);
+    //     $stock = Stock::findOrFail($request->item_id);
 
-        // Check if there's enough stock available only when status is "ready to pick up"
-        if ($request->withdrawal_status === 'Ready to Pick Up') {
-            if ($stock->remaining_stocks < $request->quantity) {
-                return back()->with('error', 'Insufficient stock available.');
-            }
+    //     // Check if there's enough stock available only when status is "ready to pick up"
+    //     if ($request->withdrawal_status === 'Ready to Pick Up') {
+    //         if ($stock->current_stock < $request->quantity) {
+    //             return back()->with('error', 'Insufficient stock available.');
+    //         }
 
-            // Deduct stock only when status is "ready to pick up"
-            $stock->remaining_stocks -= $request->quantity;
-            $stock->save();
-        }
+    //         // Deduct stock only when status is "ready to pick up"
+    //         $stock->current_stock -= $request->quantity;
+    //         $stock->save();
+    //     }
 
-        return back()->with('success', 'Withdrawal request processed successfully.');
-    }
+    //     return back()->with('success', 'Withdrawal request processed successfully.');
+    // }
 
     public function updateStock(Request $request)
     {
         $request->validate([
             'item_id' => 'required|exists:stocks,id',
-            'remaining stocks' => 'required|integer|min:1' // Changed min to 1 since we're adding
+            'current_stock' => 'required|integer|min:1' // Quantity to add
         ]);
 
         try {
             $stock = Stock::findOrFail($request->item_id);
 
             // Add the new quantity to the existing stock
-            $stock->current_stocks += $request->current_stocks;
+            $stock->current_stock += $request->current_stock;
+
+            // Also update remaining stocks
+            $stock->remaining_stocks += $request->current_stock;
+
             $stock->save();
 
             return response()->json([
                 'success' => true,
                 'item_id' => $stock->id,
-                'current_stocks' => $stock->current_stocks,
-                'message' => 'Stock updated successfully! Added ' . $request->current_stocks . ' items. New total: ' . $stock->current_stocks
+                'current_stock' => $stock->current_stock,
+                'remaining_stocks' => $stock->remaining_stocks,
+                'message' => 'Stock updated successfully! Added ' . $request->current_stock . ' items. New total: ' . $stock->current_stock
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -95,15 +100,17 @@ class StockController extends Controller
             ], 500);
         }
     }
+
     public function addNewItem(Request $request)
     {
         try {
             $validated = $request->validate([
                 'item_name' => 'required|string|max:255',
-                'variant_type' => 'required|string|in:color,type,size',
+                'variant_type' => 'required|string|in:color,size,material',
                 'variant_value' => 'required|string|max:255',
-                'quantity' => 'required|integer|min:0',
-                'reorderpoint' => 'required|integer|min:0', // added validation
+                'current_stock' => 'required|integer|min:0',
+                'reorderpoint' => 'required|integer|min:0',
+                'order_quantity' => 'nullable|integer|min:0', // optional if you want suggested reorder qty
             ]);
 
             // Check if item with same name and variant already exists
@@ -118,12 +125,15 @@ class StockController extends Controller
                 ], 422);
             }
 
+            // Create stock
             $stock = Stock::create([
                 'item_name' => $validated['item_name'],
                 'variant_type' => $validated['variant_type'],
                 'variant_value' => $validated['variant_value'],
-                'current_stocks' => $validated['quantity'],
-                'reorderpoint' => $validated['reorderpoint'], // added
+                'current_stock' => $validated['current_stock'],
+                'remaining_stocks' => $validated['current_stock'], // all stock available
+                'reorderpoint' => $validated['reorderpoint'],
+                'order_quantity' => $validated['order_quantity'] ?? 0, // default to 0 if not provided
             ]);
 
             return response()->json([

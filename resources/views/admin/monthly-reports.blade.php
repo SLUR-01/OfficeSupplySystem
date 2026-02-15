@@ -1,4 +1,4 @@
-
+{{-- 
 
 @extends('layouts.admin')
 
@@ -111,7 +111,7 @@
                         <div class="flex-1 min-w-[120px]">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
                             <select name="year" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                                @for($y = date('Y'); $y >= 2020; $y--)
+                                @for ($y = date('Y'); $y >= 2020; $y--)
                                     <option value="{{ $y }}" {{ $y == date('Y') ? 'selected' : '' }}>{{ $y }}</option>
                                 @endfor
                             </select>
@@ -120,7 +120,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Month</label>
                             <select name="month" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                                 <option value="">All</option>
-                                @foreach(range(1, 12) as $month)
+                                @foreach (range(1, 12) as $month)
                                     <option value="{{ $month }}">
                                         {{ date('F', mktime(0, 0, 0, $month, 1)) }}
                                     </option>
@@ -149,7 +149,7 @@
                         <div class="flex-1 min-w-[120px]">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
                             <select name="year" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                                @for($y = date('Y'); $y >= 2020; $y--)
+                                @for ($y = date('Y'); $y >= 2020; $y--)
                                     <option value="{{ $y }}" {{ $y == date('Y') ? 'selected' : '' }}>{{ $y }}</option>
                                 @endfor
                             </select>
@@ -159,7 +159,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Month</label>
                             <select name="month" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                                 <option value="">All</option>
-                                @foreach(range(1, 12) as $month)
+                                @foreach (range(1, 12) as $month)
                                     <option value="{{ $month }}">
                                         {{ date('F', mktime(0, 0, 0, $month, 1)) }}
                                     </option>
@@ -213,7 +213,7 @@
     </tr>
 </thead>
 <tbody class="bg-white divide-y divide-gray-200">
-    @foreach($inventorySummary as $item)
+    @foreach ($inventorySummary as $item)
     <tr 
         data-month="{{ $month }}" 
         data-year="{{ $year }}"
@@ -578,4 +578,4 @@
 
 
 @endsection
-
+ --}}

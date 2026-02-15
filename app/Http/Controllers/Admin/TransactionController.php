@@ -47,7 +47,7 @@ class TransactionController extends Controller
                         ], 400);
                     }
 
-                    if ($stock->remaining_stocks < $item->quantity) {
+                    if ($stock->current_stock < $item->quantity) {
                         return response()->json([
                             'success' => false,
                             'message' => "Insufficient stock for '{$item->item_name}' ({$item->variant_value}). Only {$stock->remaining_stocks} available."
@@ -55,7 +55,7 @@ class TransactionController extends Controller
                     }
 
                     // Deduct the stock
-                    $stock->remaining_stocks -= $item->quantity;
+                    $stock->current_stock -= $item->quantity;
                     $stock->save();
                 }
             }
