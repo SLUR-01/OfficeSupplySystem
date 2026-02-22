@@ -13,7 +13,7 @@ class TransactionController extends Controller
 {
     public function withdrawal()
     {
-        $requests = RequestSupply::whereIn('withdrawal_status', ['Processing', 'Ready to Pick Up'])
+        $requests = RequestSupply::whereIn('withdrawal_status', ['Pending', 'Ready to Pick Up'])
             ->where('admin_status', 'Approved')
             ->orderBy('date_needed', 'asc')
             ->get();

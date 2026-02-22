@@ -24,7 +24,7 @@ class RequestSupplyController extends Controller
         }
 
         $request->admin_status = 'Approved';
-        $request->withdrawal_status = 'processing'; // pending until user prints receipt
+        $request->withdrawal_status = 'Pending'; // pending until user prints receipt
         $request->save();
 
         // Deduct stock for each item

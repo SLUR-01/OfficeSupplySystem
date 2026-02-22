@@ -32,10 +32,10 @@ return new class extends Migration
             $table->dateTime('completed_at')->nullable()->index();
 
             $table->enum('withdrawal_status', [
-                'Processing',
+                'Pending',
                 'Ready to Pick Up',
                 'Completed'
-            ])->default('Processing')->index();
+            ])->default('Pending')->index();
 
             $table->string('withdrawn_by')->nullable();
             $table->timestamps();

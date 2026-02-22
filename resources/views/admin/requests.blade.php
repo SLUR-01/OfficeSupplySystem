@@ -46,17 +46,17 @@
                 <table class="min-w-full bg-white divide-y divide-gray-200">
                     <thead class="bg-white tracking-wide font-medium">
                         <tr>
-                            <th class="px-2 py-3 text-left text-sm text-gray-600">ID</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Name</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Dept.</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Item name</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Variant</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Quantity.</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Signature</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Submitted</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Needed</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Purpose</th>
-                            <th class="px-3 py-3 text-center text-sm text-gray-600 ">Action</th>
+                            <th class="px-2 py-3 text-left text-md text-gray-600">ID</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Name</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Department</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Item name</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Variant</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Quantity</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Signature</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Submitted</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Needed</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Purpose</th>
+                            <th class="px-3 py-3 text-center text-md text-gray-600 ">Action</th>
                         </tr>
                     </thead>
                     <tbody id="requestsTbody" class="bg-white divide-y divide-gray-200">

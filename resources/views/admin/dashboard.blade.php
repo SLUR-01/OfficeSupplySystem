@@ -140,12 +140,12 @@
 
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
-                                <th class="text-left px-6 py-3 font-md text-gray-600">Requester</th>
-                                <th class="text-left px-6 py-3 font-md text-gray-600">Department</th>
-                                <th class="text-left px-6 py-3 font-md text-gray-600">Items Withdrawn</th>
-                                <th class="text-left px-6 py-3 font-md text-gray-600">Quantity</th>
-                                <th class="text-left px-6 py-3 font-md text-gray-600">Date Completed</th>
-                                <th class="text-left px-6 py-3 font-md text-gray-600">Status</th>
+                                <th class="text-left px-6 py-3 text-md text-gray-600">Requester</th>
+                                <th class="text-left px-6 py-3 text-md text-gray-600">Department</th>
+                                <th class="text-left px-6 py-3 text-md text-gray-600">Items Withdrawn</th>
+                                <th class="text-left px-6 py-3 text-md text-gray-600">Quantity</th>
+                                <th class="text-left px-6 py-3 text-md text-gray-600">Date Completed</th>
+                                <th class="text-left px-6 py-3 text-md text-gray-600">Status</th>
                             </tr>
                         </thead>
 
@@ -262,7 +262,7 @@
                 <table class="w-full border border-gray-300 text-sm">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="border px-3 py-2">Item Name</th>
+                            <th class="border px-3 py-2 ">Item Name</th>
                             <th class="border px-3 py-2">Variant</th>
                             <th class="border px-3 py-2">Current Stock</th>
                             <th class="border px-3 py-2">Total Withdrawn</th>

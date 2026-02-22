@@ -101,14 +101,14 @@
                         <span id="nav-text" class="px-2 ml-2 text-md">Inventory</span>
                     </a>
                 </li>
-                <li>
+                {{-- <li>
                     <a href="{{ route('admin.monthly-reports') }}"
                         class="flex items-center py-2.5 text-dark hover:bg-gray-100 transition hover:rounded-md 
                         {{ request()->routeIs('admin.monthly-reports') ? 'active-nav bg-gray-100 rounded-md' : '' }}">
                         <i class="fas fa-calendar-alt text-teal-600 px-2"></i>
                         <span id="nav-text" class="px-2 ml-2 text-md">Reports</span>
                     </a>
-                </li>
+                </li> --}}
 
                 <li>
                     <a href="{{ route('admin.users') }}"

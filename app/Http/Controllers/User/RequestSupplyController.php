@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Models\Stock;
-use Illuminate\Http\Request;
-use App\Models\RequestSupply;
-use App\Models\ReturnRequest;
 use App\Http\Controllers\Controller;
 use App\Mail\NewRequestNotification;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
+use App\Models\RequestSupply;
+use App\Models\ReturnRequest;
+use App\Models\Stock;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class RequestSupplyController extends Controller
 {

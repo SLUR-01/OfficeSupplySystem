@@ -13,6 +13,34 @@
         </div>
 
         <!-- Table Header -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+            <!-- Total Requests -->
+            <div class="bg-white shadow-md rounded-lg p-4 border-l-4 hover:shadow-lg transition cursor-pointer">
+                <p class="text-sm text-gray-500">Total Requests</p>
+                <h2 class="text-2xl font-bold text-gray-800">{{ $totalRequests }}</h2>
+            </div>
+
+            <!-- Pending -->
+            <div class="bg-white shadow-md rounded-lg p-4 border-l-4  hover:shadow-lg transition cursor-pointer">
+                <p class="text-sm text-gray-500">Pending Requests</p>
+                <h2 class="text-2xl font-bold text-yellow-600">{{ $processingRequests }}</h2>
+            </div>
+
+            <!-- Approved -->
+            <div class="bg-white shadow-md rounded-lg p-4 border-l-4  hover:shadow-lg transition cursor-pointer">
+                <p class="text-sm text-gray-500">Approved Requests</p>
+                <h2 class="text-2xl font-bold text-green-600">{{ $approvedRequests }}</h2>
+            </div>
+
+            <!-- Ready to Pick Up -->
+            <div class="bg-white shadow-md rounded-lg p-4 border-l-4  hover:shadow-lg transition cursor-pointer">
+                <p class="text-sm text-gray-500">Ready to Pick Up</p>
+                <h2 class="text-2xl font-bold text-purple-600">{{ $readyToPickup }}</h2>
+            </div>
+
+        </div>
+
         <div class=" gap-2 rounded-md gap-30 flex items-start">
             <div class="relative w-full flex-grow sm:flex-grow-0">
                 <input type="text" id="searchInput"
@@ -25,7 +53,6 @@
                 </svg>
             </div>
         </div>
-
         <!-- Stocks Table -->
         <div class="bg-white rounded-md overflow-hidden shadow-md">
             <div class="overflow-x-auto px-3">
@@ -33,10 +60,10 @@
                     <thead class="bg-white tracking-wide">
                         <tr>
 
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">No.</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Item Name </th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">variant value</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Stocks</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">No.</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Item name </th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Variant</th>
+                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Remaining Stocks</th>
 
 
                         </tr>
@@ -49,19 +76,19 @@
                                 <td class="px-3 py-3 text-gray-800 font-medium capitalize">{{ $stock->variant_value }}</td>
 
                                 <td class="px-3 py-3 text-gray-800 font-medium">
-                                    @if ($stock->current_stock == 0)
+                                    @if ($stock->remaining_stocks == 0)
                                         <span class="px-2 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full">
                                             Out of stock
                                         </span>
-                                    @elseif ($stock->current_stock < 20)
+                                    @elseif ($stock->remaining_stocks < 20)
                                         <span
                                             class="px-2 py-1 text-xs font-semibold text-yellow-700 bg-yellow-100 rounded-full">
-                                            Low stock ({{ $stock->current_stock }})
+                                            Low stock ({{ $stock->remaining_stocks }})
                                         </span>
                                     @else
                                         <span
                                             class="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full">
-                                            {{ $stock->current_stock }} in stock
+                                            {{ $stock->remaining_stocks }} in stock
                                         </span>
                                     @endif
                                 </td>

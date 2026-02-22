@@ -31,26 +31,40 @@ class UserController extends Controller
 
     public function dashboard()
     {
-        $requests = RequestSupply::where('user_id', auth()->id())->get();
+        $userId = auth()->id();
 
-        $stocks = Stock::orderBy('item_name')
-            ->get();
+        // Request counts
+        $totalRequests = RequestSupply::where('user_id', $userId)->count();
 
+        $pendingRequests = RequestSupply::where('user_id', $userId)
+            ->where('withdrawal_status', 'Pending')
+            ->count();
+
+        $approvedRequests = RequestSupply::where('user_id', $userId)
+            ->where('withdrawal_status', 'approved')
+            ->count();
+
+        $readyToPickup = RequestSupply::where('user_id', $userId)
+            ->where('withdrawal_status', 'Ready to pick up')
+            ->count();
+
+        // ✅ Define stocks BEFORE using it
+        $stocks = Stock::orderBy('item_name')->get();
 
         $itemNames = $stocks->pluck('item_name');
         $quantities = $stocks->pluck('current_stock');
 
-        return view(
-            'user.dashboard',
-            compact(
-                'requests',
-                'itemNames',
-                'quantities',
-                'stocks',
-
-            )
-        );
+        return view('user.dashboard', compact(
+            'stocks',
+            'totalRequests',
+            'pendingRequests',
+            'approvedRequests',
+            'readyToPickup',
+            'itemNames',
+            'quantities'
+        ));
     }
+
 
     //     public function getStatus($id)
     // {

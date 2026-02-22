@@ -324,6 +324,7 @@
     <script>
         let deleteItemId = null;
 
+        // Open delete modal
         document.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', () => {
                 deleteItemId = button.dataset.id;
@@ -332,10 +333,13 @@
             });
         });
 
+        // Cancel delete
         document.getElementById('cancelDelete').addEventListener('click', () => {
             document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
         });
 
+        // Confirm delete
         document.getElementById('confirmDelete').addEventListener('click', () => {
             fetch(`/admin/stock/${deleteItemId}`, {
                     method: 'DELETE',
@@ -346,9 +350,32 @@
                 })
                 .then(res => res.json())
                 .then(data => {
+                    document.getElementById('deleteModal').classList.add('hidden');
+                    document.getElementById('deleteModal').classList.remove('flex');
+
                     if (data.success) {
-                        location.reload(); // or remove row dynamically
+                        // Show SweetAlert confirmation
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted!',
+                            text: data.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            // Option 1: Reload the page
+                            location.reload();
+
+                            // Option 2: Remove the row dynamically without reload
+                            // document.querySelector(`button[data-id="${deleteItemId}"]`).closest('tr').remove();
+                        });
                     }
+                })
+                .catch(err => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops!',
+                        text: 'Something went wrong while deleting the item.'
+                    });
                 });
         });
 

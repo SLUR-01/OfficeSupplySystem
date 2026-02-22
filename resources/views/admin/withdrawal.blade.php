@@ -43,22 +43,22 @@
                 <table class="min-w-full bg-white divide-y divide-gray-200">
                     <thead class="bg-white tracking-wide font-medium">
                         <tr>
-                            <th class="py-3 text-center text-sm text-gray-600 ">ID</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Name</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Dept</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Item name</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Variant</th>
+                            <th class="py-3 text-center text-md text-gray-600 ">ID</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Name</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Department</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Item name</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Variant</th>
 
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Quantity</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Date needed</th>
-                            <th class="px-3 py-3 text-left text-sm text-gray-600 ">Purpose</th>
-                            <th class="px-3 py-3 text-center text-sm text-gray-600 ">Withdrawal</th>
-                            <th class="px-3 py-3 text-center text-sm text-gray-600 ">Action</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Quantity</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Date needed</th>
+                            <th class="px-3 py-3 text-left text-md text-gray-600 ">Purpose</th>
+                            <th class="px-3 py-3 text-center text-md text-gray-600 ">Withdrawal</th>
+                            <th class="px-3 py-3 text-center text-md text-gray-600 ">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         @foreach ($requests as $request)
-                            @if (in_array($request->withdrawal_status, ['Processing', 'Ready to Pick Up']) && $request->admin_status === 'Approved')
+                            @if (in_array($request->withdrawal_status, ['Pending', 'Ready to Pick Up']) && $request->admin_status === 'Approved')
                                 <tr class="hover:bg-gray-50 transition" data-request-id="{{ $request->id }}">
                                     <td class="px-2 py-4 text-sm text-gray-800 text-left">{{ $request->user_id }}</td>
 
@@ -115,7 +115,7 @@
                                         <div class="w-full flex justify-center items-center space-x-2">
                                             <span
                                                 class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                                            {{ $request->withdrawal_status === 'Processing'
+                                            {{ $request->withdrawal_status === 'Pending'
                                                 ? 'bg-yellow-100 text-yellow-800'
                                                 : ($request->withdrawal_status === 'Ready to Pick Up'
                                                     ? 'bg-blue-100 text-blue-800 animate-beat'
@@ -136,7 +136,7 @@
                                         <div id="dropdown-{{ $request->id }}"
                                             class="dropdown hidden absolute right-7 w-48 bg-white shadow-md border rounded-lg z-50"
                                             style="top: -20px; right: 50px;">
-                                            @if ($request->withdrawal_status === 'Processing')
+                                            @if ($request->withdrawal_status === 'Pending')
                                                 <button type="button"
                                                     onclick="confirmReadyToPickUp('{{ $request->id }}')"
                                                     class="block w-full text-left px-4 py-2 text-sm text-blue-700 hover:bg-blue-100">

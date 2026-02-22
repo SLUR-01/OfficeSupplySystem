@@ -21,14 +21,14 @@
             <table id="requestTable" class="min-w-full bg-white divide-y divide-gray-200">
                 <thead class="bg-white tracking-wide">
                     <tr>
-                        <th class="py-3 text-left text-sm text-gray-600 uppercase">REQUEST ID</th>
-                        <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Item Name</th>
-                        <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Quantity</th>
-                        <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Date &amp; Time</th>
-                        <th class="px-3 py-3 text-left text-sm text-gray-600 uppercase">Date Needed</th>
-                        <th class="px-3 py-3 text-center text-sm text-gray-600 uppercase">Approval</th>
-                        <th class="px-3 py-3 text-center text-sm text-gray-600 uppercase">Withdrawal</th>
-                        <th class="px-3 py-3 text-center text-sm text-gray-600 uppercase">Action</th>
+                        <th class="py-3 text-left text-sm text-gray-600">Request ID</th>
+                        <th class="px-3 py-3 text-left text-sm text-gray-600">Item name</th>
+                        <th class="px-3 py-3 text-left text-sm text-gray-600 ">Quantity</th>
+                        <th class="px-3 py-3 text-left text-sm text-gray-600 ">Date &amp; Time</th>
+                        <th class="px-3 py-3 text-left text-sm text-gray-600 ">Needed</th>
+                        <th class="px-3 py-3 text-center text-sm text-gray-600 ">Approval</th>
+                        <th class="px-3 py-3 text-center text-sm text-gray-600 ">Withdrawal</th>
+                        <th class="px-3 py-3 text-center text-sm text-gray-600 ">Action</th>
                     </tr>
                 </thead>
                 <tbody id="requestTbody" class="bg-white divide-y divide-gray-200">
@@ -42,9 +42,9 @@
                                 $hasRequests = true;
                             @endphp
                             <tr>
-                                <td class="py-3 whitespace-nowrap text-sm font-semibold text-dark uppercase">
+                                <td class="py-3 whitespace-nowrap text-sm font-semibold text-dark ">
 
-                                    REQ#: {{ $request->id }}
+                                    Request {{ $request->id }}
                                 </td>
 
                                 <!-- Items Column -->
@@ -72,7 +72,8 @@
 
                                 </td>
                                 <td class="px-3 text-sm text-dark">
-                                    {{ \Carbon\Carbon::parse($request->datetime)->format('d/m/Y') }} <br>
+                                    {{ \Carbon\Carbon::parse($request->datetime)->format('Y-m-d') }}
+                                    <br>
                                     {{ \Carbon\Carbon::parse($request->datetime)->format('h:i A') }}
                                 </td>
                                 <td class="px-3 text-sm ">
@@ -303,13 +304,13 @@
 
         <!-- Signature Section BELOW the table -->
     ${reqData.signature ? `
-                        <div class="mt-6 flex justify-end">
-                            <div>
-                                <p class="text-sm font-semibold mb-1 text-left">Signature:</p>
-                                <img src="${reqData.signature}" alt="Signature" class="h-16 border border-gray-300">
-                            </div>
-                        </div>
-                    ` : ''}
+                                                    <div class="mt-6 flex justify-end">
+                                                        <div>
+                                                            <p class="text-sm font-semibold mb-1 text-left">Signature:</p>
+                                                            <img src="${reqData.signature}" alt="Signature" class="h-16 border border-gray-300">
+                                                        </div>
+                                                    </div>
+                                                ` : ''}
 
 
 

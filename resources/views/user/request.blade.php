@@ -149,16 +149,20 @@
                         <option value="" disabled selected>Select an item</option>
                         @foreach ($stocks as $stock)
                             @php
-                                $isOutOfStock = $stock->current_stock <= 0;
-                                $isLowStock = $stock->current_stock > 0 && $stock->current_stock <= 10;
+                                $isOutOfStock = $stock->remaining_stocks <= 0;
+                                $isLowStock = $stock->remaining_stocks > 0 && $stock->remaining_stocks <= 10;
                                 $variantDisplay = $stock->variant_value ? " ({$stock->variant_value})" : '';
                                 $stockStatus = $isOutOfStock ? ' (Out of stock)' : ($isLowStock ? ' (Low stock)' : '');
                             @endphp
                             <option value="{{ $stock->id }}" {{ $isOutOfStock ? 'disabled' : '' }}
                                 data-item-name="{{ $stock->item_name }}"
                                 data-variant-value="{{ $stock->variant_value ?? '' }}"
-                                data-current-stock="{{ $stock->current_stock }}">
-                                {{ $stock->item_name }}{{ $variantDisplay }}{{ $stockStatus }}
+                                data-remaining-stocks="{{ $stock->remaining_stocks }}">
+                                {{ $stock->item_name }}
+                                @if ($stock->variant_value)
+                                    ({{ $stock->variant_value }})
+                                @endif
+                                - {{ $stock->remaining_stocks }} in stock
                             </option>
                         @endforeach
                     </select>
@@ -185,6 +189,32 @@
 
     </div>
 
+
+    @if (session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: "{{ session('success') }}",
+                    confirmButtonColor: '#0d9488' // teal
+                });
+            });
+        </script>
+    @endif
+
+    @if (session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: "{{ session('error') }}",
+                    confirmButtonColor: '#dc2626'
+                });
+            });
+        </script>
+    @endif
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -248,27 +278,49 @@
                 const quantityInput = document.getElementById('modalItemQuantity');
                 const error = document.getElementById('modalQuantityError');
 
-                if (!select.value) return alert('Please select an item.');
+                if (!select.value) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No item selected',
+                        text: 'Please select an item.'
+                    });
+                    return;
+                }
 
                 const option = select.options[select.selectedIndex];
                 const stockId = option.value;
                 const itemName = option.dataset.itemName;
                 const variant = option.dataset.variantValue || '';
-                const maxStock = parseInt(option.dataset.currentStock);
-                const quantity = parseInt(quantityInput.value);
+                const maxStock = parseInt(option.dataset.remainingStocks, 10);
+                const quantity = parseInt(quantityInput.value, 10);
+
+                // Check if quantity is valid
+                if (isNaN(quantity) || quantity < 1) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid quantity',
+                        text: 'Quantity must be at least 1.'
+                    });
+                    return;
+                }
 
                 if (quantity > maxStock) {
-                    error.classList.remove('hidden');
+                    error.classList.remove('hidden'); // show inline error
                     return;
                 }
                 error.classList.add('hidden');
 
                 // Prevent duplicates
                 if (selectedItems.find(i => i.stock_id == stockId)) {
-                    alert('Item already added.');
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Item already added',
+                        text: `${itemName} is already in the list.`
+                    });
                     return;
                 }
 
+                // Add item
                 selectedItems.push({
                     stock_id: stockId,
                     item_name: itemName,
