@@ -144,30 +144,44 @@
 
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Item</label>
+
                     <select id="modalItemSelect"
-                        class="block w-full rounded-md border border-gray-300 bg-gray-100 py-2 px-3 shadow-sm focus:ring-2 focus:ring-blue-500">
+                        class="block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:ring-2 focus:ring-blue-500">
+
                         <option value="" disabled selected>Select an item</option>
+
                         @foreach ($stocks as $stock)
                             @php
                                 $isOutOfStock = $stock->remaining_stocks <= 0;
-                                $isLowStock = $stock->remaining_stocks > 0 && $stock->remaining_stocks <= 10;
-                                $variantDisplay = $stock->variant_value ? " ({$stock->variant_value})" : '';
-                                $stockStatus = $isOutOfStock ? ' (Out of stock)' : ($isLowStock ? ' (Low stock)' : '');
+                                $isLowStock = $stock->remaining_stocks <= $stock->reorderpoint;
+                                $textColor = $isOutOfStock
+                                    ? 'text-red-600'
+                                    : ($isLowStock
+                                        ? 'text-yellow-600'
+                                        : 'text-green-600');
+
+                                $bgColor = $isOutOfStock ? 'bg-red-50' : ($isLowStock ? 'bg-yellow-50' : 'bg-green-50');
                             @endphp
+
                             <option value="{{ $stock->id }}" {{ $isOutOfStock ? 'disabled' : '' }}
+                                class="{{ $textColor }} {{ $bgColor }}"
+                                data-remaining-stocks="{{ $stock->remaining_stocks }}"
                                 data-item-name="{{ $stock->item_name }}"
-                                data-variant-value="{{ $stock->variant_value ?? '' }}"
-                                data-remaining-stocks="{{ $stock->remaining_stocks }}">
+                                data-variant-value="{{ $stock->variant_value ?? '' }}">
                                 {{ $stock->item_name }}
                                 @if ($stock->variant_value)
                                     ({{ $stock->variant_value }})
                                 @endif
                                 - {{ $stock->remaining_stocks }} in stock
+                                @if ($isOutOfStock)
+                                    (Out of Stock)
+                                @elseif($isLowStock)
+                                    (Low Stock)
+                                @endif
                             </option>
                         @endforeach
                     </select>
                 </div>
-
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
                     <input type="number" id="modalItemQuantity" min="1" value="1"

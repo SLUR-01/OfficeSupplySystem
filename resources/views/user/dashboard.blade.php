@@ -11,35 +11,120 @@
                 <p class="text-base text-dark mt-1 mb-3">Stocks Overview &amp; Item Search</p>
             </div>
         </div>
+        <div class="mb-6 flex flex-wrap lg:flex-nowrap gap-6 mb-10 w-full">
 
-        <!-- Table Header -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <!-- Total Stocks -->
+            <div
+                class="flex-1 min-w-[260px] bg-white border border-gray-200 rounded-md p-6 shadow-sm hover:shadow-md transition duration-200">
 
-            <!-- Total Requests -->
-            <div class="bg-white shadow-md rounded-lg p-4 border-l-4 hover:shadow-lg transition cursor-pointer">
-                <p class="text-sm text-gray-500">Total Requests</p>
-                <h2 class="text-2xl font-bold text-gray-800">{{ $totalRequests }}</h2>
+                <div class="flex items-start justify-between">
+
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">
+                            Total Request
+                        </p>
+
+                        <h2 class="text-3xl font-semibold text-gray-900 mt-2">
+                            {{ $totalRequests }}
+                        </h2>
+
+                        <p class="text-xs text-gray-400 mt-2">
+                            Current inventory count
+                        </p>
+                    </div>
+
+                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-md flex items-center justify-center">
+                        <i class='bx bx-clipboard text-3xl'></i>
+                    </div>
+
+                </div>
             </div>
 
-            <!-- Pending -->
-            <div class="bg-white shadow-md rounded-lg p-4 border-l-4  hover:shadow-lg transition cursor-pointer">
-                <p class="text-sm text-gray-500">Pending Requests</p>
-                <h2 class="text-2xl font-bold text-yellow-600">{{ $processingRequests }}</h2>
+
+            <!-- Low Stocks -->
+            <div
+                class="flex-1 min-w-[260px] bg-white border border-gray-200 rounded-md p-6 shadow-sm hover:shadow-md transition duration-200">
+
+                <div class="flex items-start justify-between">
+
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">
+                            Pending requests
+
+                        <h2 class="text-3xl font-semibold text-gray-900 mt-2">
+                            {{ $pendingRequests }}
+                        </h2>
+
+                        <p class="text-xs text-gray-400 mt-2">
+                            Items below reorder level
+                        </p>
+                    </div>
+
+                    <div class="w-16 h-16 bg-red-100 text-red-600 rounded-md flex items-center justify-center">
+                        <i class='bx bx-time-five text-3xl'></i>
+                    </div>
+
+                </div>
             </div>
 
-            <!-- Approved -->
-            <div class="bg-white shadow-md rounded-lg p-4 border-l-4  hover:shadow-lg transition cursor-pointer">
-                <p class="text-sm text-gray-500">Approved Requests</p>
-                <h2 class="text-2xl font-bold text-green-600">{{ $approvedRequests }}</h2>
+
+            <!-- Pending Requests -->
+            <div
+                class="flex-1 min-w-[260px] bg-white border border-gray-200 rounded-md p-6 shadow-sm hover:shadow-md transition duration-200">
+
+                <div class="flex items-start justify-between">
+
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">
+                            Approve requests
+                        </p>
+
+                        <h2 class="text-3xl font-semibold text-gray-900 mt-2">
+                            {{ $approvedRequests }}
+                        </h2>
+
+                        <p class="text-xs text-gray-400 mt-2">
+                            Awaiting approval
+                        </p>
+                    </div>
+
+                    <div class="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-md flex items-center justify-center">
+                        <i class='bx bx-badge-check text-3xl'></i>
+                    </div>
+
+                </div>
             </div>
 
-            <!-- Ready to Pick Up -->
-            <div class="bg-white shadow-md rounded-lg p-4 border-l-4  hover:shadow-lg transition cursor-pointer">
-                <p class="text-sm text-gray-500">Ready to Pick Up</p>
-                <h2 class="text-2xl font-bold text-purple-600">{{ $readyToPickup }}</h2>
+
+            <!-- Completed Requests -->
+            <div
+                class="flex-1 min-w-[260px] bg-white border border-gray-200 rounded-md p-6 shadow-sm hover:shadow-md transition duration-200">
+
+                <div class="flex items-start justify-between">
+
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">
+                            Ready to pick up!
+                        </p>
+
+                        <h2 class="text-3xl font-semibold text-gray-900 mt-2">
+                            {{ $readyToPickup }}
+                        </h2>
+
+                        <p class="text-xs text-gray-400 mt-2">
+                            Successfully processed
+                        </p>
+                    </div>
+
+                    <div class="w-16 h-16 bg-green-100 text-teal-600 rounded-md flex items-center justify-center">
+                        <i class='bx bx-package text-3xl'></i>
+                    </div>
+
+                </div>
             </div>
 
         </div>
+        <!-- Table Header -->
 
         <div class=" gap-2 rounded-md gap-30 flex items-start">
             <div class="relative w-full flex-grow sm:flex-grow-0">

@@ -15,7 +15,6 @@ class RequestSupplyController extends Controller
 
     public function approve($id)
     {
-        // Load request with its items
         $request = RequestSupply::with('items')->findOrFail($id);
 
         // Only admin can approve
@@ -23,30 +22,14 @@ class RequestSupplyController extends Controller
             return response()->json(['error' => 'Unauthorized.'], 403);
         }
 
+        // Just update statuses
         $request->admin_status = 'Approved';
-        $request->withdrawal_status = 'Pending'; // pending until user prints receipt
+        $request->withdrawal_status = 'Pending';
         $request->save();
 
-        // Deduct stock for each item
-        foreach ($request->items as $item) {
-            if (!$item->stock_id) {
-                return response()->json(['error' => "Item ID missing for {$item->item_name}"], 400);
-            }
-
-            $stock = Stock::find($item->stock_id);
-
-            if (!$stock) {
-                return response()->json(['error' => "Stock not found for item: {$item->item_name}"], 400);
-            }
-
-            if ($stock->remaining_stocks < $item->quantity) {
-                return response()->json([
-                    'error' => "Insufficient stock for item: {$item->item_name}."
-                ], 400);
-            }
-        }
-
-        return response()->json(['message' => 'Request Approved Successfully!']);
+        return response()->json([
+            'message' => 'Request Approved Successfully!'
+        ]);
     }
 
 
