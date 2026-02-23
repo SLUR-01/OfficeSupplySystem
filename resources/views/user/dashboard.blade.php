@@ -34,7 +34,7 @@
                     </div>
 
                     <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-md flex items-center justify-center">
-                        <i class='bx bx-clipboard text-3xl'></i>
+                        <i class='bx bx-box text-2xl'></i>
                     </div>
 
                 </div>
@@ -61,7 +61,7 @@
                     </div>
 
                     <div class="w-16 h-16 bg-red-100 text-red-600 rounded-md flex items-center justify-center">
-                        <i class='bx bx-time-five text-3xl'></i>
+                        <i class='bx bx-error-circle text-2xl'></i>
                     </div>
 
                 </div>
@@ -89,7 +89,7 @@
                     </div>
 
                     <div class="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-md flex items-center justify-center">
-                        <i class='bx bx-badge-check text-3xl'></i>
+                        <i class='bx bx-time-five text-2xl'></i>
                     </div>
 
                 </div>
@@ -117,7 +117,7 @@
                     </div>
 
                     <div class="w-16 h-16 bg-green-100 text-teal-600 rounded-md flex items-center justify-center">
-                        <i class='bx bx-package text-3xl'></i>
+                        <i class='bx bx-check-circle text-2xl'></i>
                     </div>
 
                 </div>
